@@ -164,17 +164,48 @@ export function normaliseMissing(missing: unknown, categories: string[]): Missin
 const ROLE_RE =
   /(engineer|developer|designer|manager|architect|\blead\b|analyst|consultant|specialist|intern|programmer|administrator|scientist|full[\s-]?stack|frontend|front[\s-]?end|backend|back[\s-]?end|sde|devops)/i;
 
+/** Remove emojis, flags and decorative bullets ("🚀", "📍", "🔹", "•", "➤"). */
+export function stripDecor(s: string): string {
+  return (s || "")
+    .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\uFE0F\u200D\u20E3]/gu, "")
+    .replace(/[•●▪◆◇■□★☆✓✔➤►▶→◉○]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const HIRING_PREFIX =
+  /^(?:(?:we['’]?re|we are|now|urgently|actively)\s+)?hiring\s*(?:for)?\s*[:\-–—|!]*\s*/i;
+const LABEL_PREFIX =
+  /^(?:urgent\s+)?(?:job\s+title|job\s+role|job\s+opening|opening|vacancy|requirement|position|designation|role|title)\s*(?:for)?\s*[:\-–—|]\s*/i;
+
+/** Tidy one candidate line down to just the role, e.g.
+ *  "🚀 We're Hiring – Full Stack Developer" -> "Full Stack Developer". */
+function cleanRoleLine(line: string): string {
+  let c = stripDecor(line);
+  c = c.replace(HIRING_PREFIX, "").replace(LABEL_PREFIX, "").replace(/^[\s:\-–—|!]+/, "");
+  // "Acme | Full-Stack Developer | Remote" or "Hiring – Backend Engineer – Pune":
+  // keep the segment that looks like a role (hyphenated words like Full-Stack are not split)
+  const parts = c.split(/\s+[–—-]\s+|\s*\|\s*/).map((s) => s.trim()).filter(Boolean);
+  if (parts.length > 1) {
+    const hit = parts
+      .map((s) => s.replace(HIRING_PREFIX, "").replace(LABEL_PREFIX, "").trim())
+      .find((s) => ROLE_RE.test(s));
+    if (hit) c = hit;
+  }
+  return c.replace(/[.;:!,]+$/, "").trim();
+}
+
 export function guessRoleFromJD(jd: string): string {
   const lines = (jd || "").split(/\n/).map((l) => l.trim()).filter(Boolean);
-  for (const l of lines.slice(0, 10)) {
-    const c = l.replace(/^(role|position|job title|title)\s*[:\-]\s*/i, "").replace(/[.;:]+$/, "");
-    if (ROLE_RE.test(c) && c.length <= 60) return c;
+  for (const l of lines.slice(0, 12)) {
+    const c = cleanRoleLine(l);
+    if (c && ROLE_RE.test(c) && c.length <= 60) return c;
   }
   return "";
 }
 
 /** "NAYAN MEHTA" -> "Nayan Mehta" */
-const titleCase = (s: string) =>
+export const titleCase = (s: string) =>
   s.toLowerCase().replace(/\b\p{L}/gu, (c) => c.toUpperCase());
 
 /**
@@ -185,7 +216,7 @@ const titleCase = (s: string) =>
  */
 export function pdfFileName(role: string, candidateName: string): string {
   const clean = (s: string) =>
-    s.replace(/@/g, " at ")
+    stripDecor(s).replace(/@/g, " at ")
       .replace(/[\\/:*?"<>|#%{}~&]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -265,4 +296,13 @@ const EMAIL_IGNORE = /^(example|test|sample|noreply|no-reply|donotreply|do-not-r
 export function detectEmails(text: string): string[] {
   const found = (text || "").match(EMAIL_RE) ?? [];
   return Array.from(new Set(found.filter((e) => !EMAIL_IGNORE.test(e))));
+}
+
+/**
+ * Resume headers store the name in capitals ("NAYAN MEHTA"); the AI copies
+ * that into emails and messages, which reads as shouting. Normal-case it.
+ */
+export function fixNameCase(text: string | undefined, name: string): string {
+  if (!text || !name || name !== name.toUpperCase() || !/[A-Z]/.test(name)) return text ?? "";
+  return text.split(name).join(titleCase(name));
 }

@@ -40,8 +40,15 @@ export function AtsTab({ report }: { report: AtsReport | null }) {
 
 /* ---------------- Cover email ---------------- */
 export function EmailTab({
-  email, projects, onQuickApply,
-}: { email: CoverEmail | null; projects?: RelevantProject[]; onQuickApply?: () => void }) {
+  email, projects, recruiterEmails = [], onQuickApply,
+}: {
+  email: CoverEmail | null;
+  projects?: RelevantProject[];
+  /** addresses found in the pasted JD */
+  recruiterEmails?: string[];
+  /** opens a Gmail draft; receives the subject/body as currently edited */
+  onQuickApply?: (to: string, subject: string, body: string) => void;
+}) {
   const [subject, setSubject] = useState(email?.subject ?? "");
   const [body, setBody] = useState(email?.body ?? "");
   // keep local state in sync when a new email arrives
@@ -51,13 +58,28 @@ export function EmailTab({
 
   if (!email) return <div className="empty">Generate with <b>Cover Email</b> ticked to draft an email.</div>;
 
-  const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailto = `mailto:${recruiterEmails[0] ?? ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   return (
     <>
       <div className="row-between" style={{ marginBottom: 10 }}>
         <b>Cover Email</b>
-        <span style={{ display: "flex", gap: 7 }}>
-          {onQuickApply && <Button size="sm" variant="ghost" onClick={onQuickApply}>✉️ Open in Gmail</Button>}
+        <span style={{ display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          {onQuickApply && recruiterEmails.slice(0, 3).map((to) => (
+            <Button key={to} size="sm" variant="accent" onClick={() => onQuickApply(to, subject, body)}>
+              ✉️ Send via Gmail → {to}
+            </Button>
+          ))}
+          {onQuickApply && recruiterEmails.length === 0 && (
+            <Button
+              size="sm" variant="ghost"
+              onClick={() => {
+                const to = prompt("No recruiter email was found in the job description. Enter one:");
+                if (to?.trim()) onQuickApply(to.trim(), subject, body);
+              }}
+            >
+              ✉️ Open in Gmail
+            </Button>
+          )}
           <a className="btn sm ghost" href={mailto}>📧 Mail app</a>
           <CopyButton text={`Subject: ${subject}\n\n${body}`} label="Copy all" />
         </span>

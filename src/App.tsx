@@ -12,7 +12,7 @@ import {
   gapPrompt, generatePrompt, parseSystem, qaAskSystem, qaContext, qaPredictSystem,
 } from "./lib/prompts";
 import {
-  ALL_UNLOCKED, clone, defaultVersionName, diffResume, experienceTargets, pdfFileName,
+  ALL_UNLOCKED, clone, defaultVersionName, detectEmails, diffResume, experienceTargets, fixNameCase, pdfFileName, titleCase,
   normaliseMissing, safeResume,
 } from "./lib/resume";
 import { KEYS, usePersisted } from "./lib/storage";
@@ -119,6 +119,8 @@ export default function App() {
   );
   /** "Save as PDF" name, e.g. "Nayan Mehta - Senior React Native Engineer at Acme" */
   const pdfName = useMemo(() => pdfFileName(verName, resume.name), [verName, resume.name]);
+  /** recruiter addresses found in the pasted JD */
+  const jdEmails = useMemo(() => detectEmails(jd), [jd]);
 
   /** temperature per task: 0 = copy faithfully (import), low = consistent analysis, higher = natural writing */
   const ask = useCallback(
@@ -170,12 +172,15 @@ export default function App() {
       }
       if (want.ats && data.atsReport) setAts(data.atsReport);
       if (want.email && data.coverEmail) {
-        setEmail(data.coverEmail);
+        setEmail({
+          subject: fixNameCase(data.coverEmail.subject, base.name),
+          body: fixNameCase(data.coverEmail.body, base.name),
+        });
         setProjects(data.relevantProjects ?? []);
       }
-      if (want.whatsapp) setWa(data.whatsappMessage ?? "");
-      if (want.dm) setDm(data.linkedinDM ?? "");
-      if (want.comment) setComment(data.linkedinComment ?? "");
+      if (want.whatsapp) setWa(fixNameCase(data.whatsappMessage, base.name));
+      if (want.dm) setDm(fixNameCase(data.linkedinDM, base.name));
+      if (want.comment) setComment(fixNameCase(data.linkedinComment, base.name));
       if (want.qa && Array.isArray(data.applicationQA)) setQa(data.applicationQA);
 
       const first: TabId = want.resume ? "resume" : want.ats ? "ats" : want.email ? "email"
@@ -260,10 +265,10 @@ export default function App() {
     toast.ok("Added to your application tracker.");
   };
 
-  const quickApply = (to: string) => {
-    const subject = email?.subject ?? `Application — ${target || resume.title}`;
-    const body = email?.body ??
-      `Hello,\n\nI'd like to apply for the ${target || "role"}.\n\nExperience: ${profile.exp}\nNotice period: ${profile.notice}\nCurrent CTC: ${profile.current}\nExpected CTC: ${profile.expected}\n\nPortfolio: ${base.contact.portfolioUrl}\n\nBest regards,\n${base.name}\n${base.contact.phone}`;
+  const quickApply = (to: string, editedSubject?: string, editedBody?: string) => {
+    const subject = editedSubject || email?.subject || `Application for ${verName} — ${titleCase(base.name)}`;
+    const body = editedBody || email?.body ||
+      `Hello,\n\nI'd like to apply for the ${target || "role"}.\n\nExperience: ${profile.exp}\nNotice period: ${profile.notice}\nCurrent CTC: ${profile.current}\nExpected CTC: ${profile.expected}\n\nPortfolio: ${base.contact.portfolioUrl}\n\nBest regards,\n${titleCase(base.name)}\n${base.contact.phone}`;
     window.open(
       `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
       "_blank"
@@ -474,8 +479,8 @@ export default function App() {
             {tab === "diff" && <DiffTab entries={diff} />}
             {tab === "ats" && <AtsTab report={ats} />}
             {tab === "email" && (
-              <EmailTab email={email} projects={projects}
-                onQuickApply={() => { const e = prompt("Recruiter email:"); if (e) quickApply(e); }} />
+              <EmailTab email={email} projects={projects} recruiterEmails={jdEmails}
+                onQuickApply={quickApply} />
             )}
             {tab === "whatsapp" && (
               <MessageTab title="WhatsApp Message" text={wa} waLink
