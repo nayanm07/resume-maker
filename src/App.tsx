@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   AtsReport, CoverEmail, GapResult, GenerateResult, MissingSkill, OutputKey,
   Profile, PromptTemplates, ProviderId, ProviderStore, QaItem, RelevantProject, Resume,
-  SavedVersion, SectionLocks, TrackedApp, WantMap,
+  RoleFocus, SavedVersion, SectionLocks, TrackedApp, WantMap,
 } from "./types";
+import { detectFocus, positionResume } from "./lib/positioning";
 import { BASE, PROFILE_DEFAULT } from "./data/baseResume";
 import { PROVIDERS } from "./lib/providers";
 import { callLLM, parseJSON } from "./lib/llm";
@@ -47,8 +48,8 @@ export default function App() {
   const [want, setWant] = usePersisted<WantMap>(KEYS.want, WANT_DEFAULT, true);
   const [versions, setVersions] = usePersisted<SavedVersion[]>(KEYS.versions, []);
   const [apps, setApps] = usePersisted<TrackedApp[]>(KEYS.tracker, []);
-  const [draft, setDraft] = usePersisted<{ jd: string; target: string; tone: string }>(
-    KEYS.draft, { jd: "", target: "", tone: "Professional" }, true
+  const [draft, setDraft] = usePersisted<{ jd: string; target: string; tone: string; focus: RoleFocus | "auto" }>(
+    KEYS.draft, { jd: "", target: "", tone: "Professional", focus: "auto" }, true
   );
   const [locks, setLocks] = usePersisted<SectionLocks>(KEYS.locks, ALL_UNLOCKED, true);
   const [prompts, setPrompts] = usePersisted<Partial<PromptTemplates>>(KEYS.prompts, {});
@@ -64,11 +65,21 @@ export default function App() {
   const setTarget = (v: string) => setDraft({ ...draft, target: v });
   const setTone = (v: string) => setDraft({ ...draft, tone: v });
 
+  /* ---------------- role positioning (no AI, instant) ---------------- */
+  const focusPref = draft.focus ?? "auto";
+  const setFocusPref = (f: RoleFocus | "auto") => setDraft({ ...draft, focus: f });
+  const detectedFocus = useMemo(() => detectFocus(draft.target, draft.jd), [draft.target, draft.jd]);
+  const focus: RoleFocus = focusPref === "auto" ? detectedFocus : focusPref;
+  /** base resume with the role's headline/summary and relevance ordering applied */
+  const positioned = useMemo(() => positionResume(base, focus), [base, focus]);
+  /** true once the resume was generated, edited or loaded — then it stops following `positioned` */
+  const [tailored, setTailored] = useState(false);
+
   /* ---------------- session state ---------------- */
   const [tab, setTab] = useState<TabId>(storedBase ? "gap" : "mine");
   const [gap, setGap] = useState<GapResult | null>(null);
   const [picked, setPicked] = useState<Record<string, MissingSkill | undefined>>({});
-  const [resume, setResume] = useState<Resume>(base);
+  const [resume, setResume] = useState<Resume>(positioned);
   const [ats, setAts] = useState<AtsReport | null>(null);
   const [email, setEmail] = useState<CoverEmail | null>(null);
   const [projects, setProjects] = useState<RelevantProject[]>([]);
@@ -89,13 +100,15 @@ export default function App() {
   const previewRef = useRef<PreviewHandle | null>(null);
 
   useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  // until the user tailors it, the preview follows the chosen role
+  useEffect(() => { if (!tailored) setResume(positioned); }, [positioned, tailored]);
 
   const cfg = store[provider] ?? { key: "", model: PROVIDERS[provider].models[0] };
   const approved = useMemo(
     () => Object.values(picked).filter(Boolean) as MissingSkill[],
     [picked]
   );
-  const diff = useMemo(() => diffResume(base, resume), [base, resume]);
+  const diff = useMemo(() => diffResume(positioned, resume), [positioned, resume]);
   const keywords = useMemo(
     () => (highlight ? [...(ats?.matchedKeywords ?? []), ...approved.map((a) => a.skill)] : []),
     [highlight, ats, approved]
@@ -146,12 +159,13 @@ export default function App() {
     setGenerating(true);
     try {
       const { system, user } = generatePrompt({
-        base, jd: jd.trim(), want, approved, tone, target, profile, locks, prompts,
+        base: positioned, jd: jd.trim(), want, approved, tone, target, profile, locks, prompts, focus,
       });
       const data = parseJSON<GenerateResult>(await ask(system, user, 0.4));
 
       if (want.resume) {
-        setResume(safeResume(base, data.resume, approved, locks));
+        setResume(safeResume(positioned, data.resume, approved, locks));
+        setTailored(true);
         setEditing(false);
       }
       if (want.ats && data.atsReport) setAts(data.atsReport);
@@ -182,7 +196,7 @@ export default function App() {
     setPredicting(true);
     try {
       const data = parseJSON<{ qa: QaItem[] }>(
-        await ask(qaPredictSystem(prompts), qaContext(base, jd.trim(), profile), 0.4)
+        await ask(qaPredictSystem(prompts), qaContext(positioned, jd.trim(), profile), 0.4)
       );
       const items = (data.qa ?? []).filter((x) => x?.q && x?.a);
       if (!items.length) throw new Error("No questions returned.");
@@ -201,7 +215,7 @@ export default function App() {
     setAsking(true);
     try {
       const data = parseJSON<{ a?: string; answer?: string }>(
-        await ask(qaAskSystem(prompts), `${qaContext(base, jd.trim(), profile)}\n\n=== QUESTION TO ANSWER ===\n${q}`, 0.4)
+        await ask(qaAskSystem(prompts), `${qaContext(positioned, jd.trim(), profile)}\n\n=== QUESTION TO ANSWER ===\n${q}`, 0.4)
       );
       const a = data.a ?? data.answer ?? "";
       if (!a) throw new Error("Empty answer.");
@@ -226,6 +240,7 @@ export default function App() {
 
   const loadVersion = (v: SavedVersion) => {
     setResume(clone(v.data));
+    setTailored(true);
     setEditing(false);
     setTab("resume");
     toast.ok(`Loaded "${v.name}".`);
@@ -261,7 +276,7 @@ export default function App() {
     if (!r.experience.length && !r.skills.length)
       throw new Error("Couldn't find any experience or skills in that file.");
     setStoredBase(r);
-    setResume(r);
+    setTailored(false);
     setGap(null);
     setPicked({});
     toast.ok(`Imported "${r.name}" — ${r.experience.length} jobs. Review it below, then analyze a JD.`);
@@ -299,15 +314,16 @@ export default function App() {
     }
   };
 
-  const setMyResume = (r: Resume) => { setStoredBase(r); setResume(r); };
+  const setMyResume = (r: Resume) => { setStoredBase(r); setTailored(false); };
+  const useBuiltInResume = () => { setStoredBase(null); setTailored(false); setGap(null); setPicked({}); };
 
   /* ---------------- editor helpers ---------------- */
   const revertSection = (s: "summary" | "skills" | "experience" | "strengths") => {
     const next = clone(resume);
-    if (s === "summary") next.summary = clone(base.summary);
-    if (s === "skills") next.skills = clone(base.skills);
-    if (s === "experience") next.experience = clone(base.experience);
-    if (s === "strengths") next.coreStrengths = clone(base.coreStrengths);
+    if (s === "summary") next.summary = clone(positioned.summary);
+    if (s === "skills") next.skills = clone(positioned.skills);
+    if (s === "experience") next.experience = clone(positioned.experience);
+    if (s === "strengths") next.coreStrengths = clone(positioned.coreStrengths);
     setResume(next);
     toast.info(`${s} restored from your base resume.`);
   };
@@ -369,6 +385,7 @@ export default function App() {
           jd={jd} setJd={setJd}
           target={target} setTarget={setTarget}
           tone={tone} setTone={setTone}
+          focusPref={focusPref} setFocusPref={setFocusPref} detectedFocus={detectedFocus}
           profile={profile} setProfile={setProfile}
           want={want}
           analyzing={analyzing}
@@ -396,6 +413,7 @@ export default function App() {
                 parsing={parsing}
                 onImportFile={importResumeFile}
                 onParseText={parseResumeText}
+                onUseBuiltIn={useBuiltInResume}
                 onError={(m) => toast.err(m)}
               />
             )}
@@ -424,12 +442,12 @@ export default function App() {
                     <Button size="sm" variant="ghost"
                       onClick={() => {
                         if (editing) { setEditing(false); return; }
-                        setPreEdit(clone(resume)); setEditing(true);
+                        setPreEdit(clone(resume)); setTailored(true); setEditing(true);
                       }}>
                       {editing ? "✕ Close editor" : "✏️ Edit"}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => saveVersion(verName)}>💾 Save version</Button>
-                    <Button size="sm" variant="ghost" onClick={() => { setResume(base); setEditing(false); }}>↺ Base</Button>
+                    <Button size="sm" variant="ghost" onClick={() => { setResume(positioned); setTailored(false); setEditing(false); }}>↺ Base</Button>
                     <Button size="sm" variant="accent" onClick={() => previewRef.current?.print(pdfName)} title={`Saves as "${pdfName}.pdf"`}>⬇ PDF</Button>
                   </span>
                 </div>

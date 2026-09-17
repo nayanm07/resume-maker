@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import type { Profile, ProviderId, ProviderStore, WantMap } from "../types";
+import type { Profile, ProviderId, ProviderStore, RoleFocus, WantMap } from "../types";
+import { FOCUS_IDS, FOCUS_LABEL } from "../lib/positioning";
 import { PROVIDERS, PROVIDER_IDS } from "../lib/providers";
 import { Button, Card, Field } from "./ui";
 import { detectEmails } from "../lib/resume";
@@ -11,6 +12,7 @@ export function Sidebar(props: {
   jd: string; setJd: (v: string) => void;
   target: string; setTarget: (v: string) => void;
   tone: string; setTone: (v: string) => void;
+  focusPref: RoleFocus | "auto"; setFocusPref: (f: RoleFocus | "auto") => void; detectedFocus: RoleFocus;
   profile: Profile; setProfile: (p: Profile) => void;
   want: WantMap;
   analyzing: boolean;
@@ -20,7 +22,7 @@ export function Sidebar(props: {
 }) {
   const {
     provider, setProvider, store, setStore, jd, setJd, target, setTarget,
-    tone, setTone, profile, setProfile, want, analyzing, onAnalyze, promptChars, onQuickApply,
+    tone, setTone, focusPref, setFocusPref, detectedFocus, profile, setProfile, want, analyzing, onAnalyze, promptChars, onQuickApply,
   } = props;
 
   const def = PROVIDERS[provider];
@@ -82,6 +84,16 @@ export function Sidebar(props: {
         <Field label="Target role / company (optional)">
           <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="e.g. Senior React Native Engineer @ Acme" />
         </Field>
+        <Field label="Position resume as">
+          <select value={focusPref} onChange={(e) => setFocusPref(e.target.value as RoleFocus | "auto")}>
+            <option value="auto">Auto — detected: {FOCUS_LABEL[detectedFocus]}</option>
+            {FOCUS_IDS.map((f) => <option key={f} value={f}>{FOCUS_LABEL[f]}</option>)}
+          </select>
+        </Field>
+        <div className="hint">
+          Swaps the headline &amp; summary and puts the most relevant skills and projects first, so a
+          full-stack role doesn't read as mobile-only. Preview updates instantly — no AI tokens.
+        </div>
         <Field label="Tone for outreach messages">
           <select value={tone} onChange={(e) => setTone(e.target.value)}>
             <option>Professional</option>

@@ -15,7 +15,7 @@ function download(filename: string, obj: unknown) {
 }
 
 export function MyResumeTab({
-  base, setBase, isOwn, parsing, onImportFile, onParseText, onError,
+  base, setBase, isOwn, parsing, onImportFile, onParseText, onUseBuiltIn, onError,
 }: {
   base: Resume;
   setBase: (r: Resume) => void;
@@ -24,6 +24,7 @@ export function MyResumeTab({
   parsing: boolean;
   onImportFile: (f: File) => void;
   onParseText: (text: string) => void;
+  onUseBuiltIn: () => void;
   onError: (msg: string) => void;
 }) {
   const [text, setText] = useState("");
@@ -83,6 +84,16 @@ export function MyResumeTab({
             onChange={(e) => { const f = e.target.files?.[0]; if (f) importJson(f); e.target.value = ""; }}
           />
           <Button variant="ghost" onClick={() => download("my-resume.json", base)}>⬇ Export .json</Button>
+          {isOwn && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (confirm("Replace your saved resume with the built-in one? Export yours first if you want to keep it.")) onUseBuiltIn();
+              }}
+            >
+              ↺ Use built-in resume
+            </Button>
+          )}
         </div>
         <div className="hint">
           Word file? Open it and “Save as PDF” first, or paste the text below.

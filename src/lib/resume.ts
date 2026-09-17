@@ -128,10 +128,10 @@ export function experienceTargets(base: Resume): string[] {
 /* Category inference for missing skills                               */
 /* ------------------------------------------------------------------ */
 const CATEGORY_RULES: [string, RegExp][] = [
-  ["Frontend", /\b(react\b|next|html|css|tailwind|vue|angular|redux|frontend|sass|bootstrap|ui)\b/],
+  ["Frontend", /\b(react\b|next|html|css|tailwind|vue|angular|redux|frontend|sass|bootstrap|ui|axios|zod|formik|javascript)\b/],
   ["Mobile", /\b(react native|kotlin|swift|android|ios|flutter|mobile|jetpack|expo)\b/],
   ["Backend", /\b(node|nest|express|java|python|django|spring|php|laravel|graphql|rest|api|microservice|postgres|mysql|mongo|sql|prisma|redis|kafka|rabbit|websocket|socket)\b/],
-  ["AI & Voice", /\b(ai|ml|llm|openai|gpt|gemini|deepgram|elevenlabs|pinecone|rag|nlp|tensorflow|pytorch|embedding|vector)\b/],
+  ["AI & Voice", /\b(ai|ml|llms?|openai|gpt|gemini|deepgram|elevenlabs|pinecone|rag|nlp|tensorflow|pytorch|embeddings?|vector|langchain|chunking|ocr|stt|tts)\b/],
   ["Payments & APIs", /\b(stripe|razorpay|paypal|coinbase|payment|whatsapp|twilio|maps|admob|firebase|oauth)\b/],
   ["Cloud & DevOps", /\b(aws|gcp|azure|docker|kubernetes|k8s|nginx|ci\/cd|cicd|jenkins|github actions|terraform|linux|vps|devops|cloud)\b/],
   ["Testing & Tools", /\b(jest|detox|cypress|playwright|postman|git\b|version control|swagger|jira|testing|junit|mocha)\b/],

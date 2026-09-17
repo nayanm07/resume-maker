@@ -3,8 +3,8 @@ import type { Resume, Profile } from "../types";
 /** Your real resume. The AI may only re-emphasise what is in here — never invent. */
 export const BASE: Resume = {
   name: "NAYAN MEHTA",
-  title: "Full-Stack Mobile & Backend Engineer",
-  subtitle: "React Native | React / Next.js | Native Android (Kotlin) | NestJS / Node.js | AI / Voice",
+  title: "Full-Stack Software Engineer",
+  subtitle: "React / Next.js | Node.js / NestJS | React Native | AI / LLM | AWS",
   contact: {
     phone: "+91 8118899048",
     email: "nayanmehta2004@gmail.com",
@@ -15,16 +15,16 @@ export const BASE: Resume = {
     portfolioUrl: "https://portfolio-black-rho.vercel.app",
   },
   summary: [
-    "Full-Stack Mobile and Backend Engineer with 2+ years of experience who has built and maintained 10+ production apps with 1.5M+ combined downloads on the Google Play Store and Apple App Store. Expertise in cross-platform React Native development with custom Kotlin native modules, React / Next.js web frontends, and architecting multi-tenant SaaS backends (NestJS, PostgreSQL, Prisma, Redis, AWS) with end-to-end AI/voice pipelines (OpenAI, Deepgram, ElevenLabs, Pinecone RAG).",
-    "Independently designed, built, and operate Clinic Cloud, a live multi-tenant healthcare SaaS integrated with India's ABDM/ABHA national health-record system. Strong focus on real-time systems, offline-first architecture, and public API design. MCA Graduate (2026).",
+    "Full-Stack Software Engineer with 2+ years of experience shipping production products across web, backend, mobile and AI — React / Next.js frontends, Node.js / NestJS APIs on PostgreSQL, React Native apps and LLM-powered features, deployed on AWS.",
+    "Built and operate Clinic Cloud, a live multi-tenant healthcare SaaS; engineered a database-per-tenant AI interview platform for 6+ universities and a public voice-AI API of 56+ endpoints; and have built or maintained 10+ production apps with 1.5M+ combined downloads.",
   ],
   skills: [
-    { label: "Mobile", items: ["React Native", "Kotlin (Native Modules)", "TypeScript", "Redux Toolkit (RTK Query)", "Offline-first SQLite", "Firebase (FCM)"] },
-    { label: "Frontend", items: ["React", "Next.js", "Redux Toolkit"] },
-    { label: "Backend", items: ["NestJS", "Node.js", "PostgreSQL", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
-    { label: "AI & Voice", items: ["OpenAI (LLM / Embeddings)", "Deepgram (STT)", "ElevenLabs (TTS)", "Pinecone (RAG)"] },
-    { label: "Payments & APIs", items: ["Razorpay", "Stripe", "PayPal", "Coinbase", "WhatsApp Cloud API", "ABDM / ABHA", "Google Maps SDK", "AdMob"] },
+    { label: "Frontend", items: ["React", "Next.js", "TypeScript", "JavaScript (ES6+)", "Redux Toolkit (RTK Query)", "Axios", "Zod", "Formik"] },
+    { label: "Backend", items: ["Node.js", "NestJS", "Express.js", "PostgreSQL", "MySQL", "MongoDB", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
+    { label: "Mobile", items: ["React Native", "Kotlin (Native Modules)", "Offline-first SQLite", "Firebase (FCM)", "Google Play Console", "App Store Connect"] },
+    { label: "AI & Voice", items: ["LLMs (OpenAI)", "RAG", "Embeddings", "Chunking", "Vector DB (Pinecone)", "STT (Deepgram)", "TTS (ElevenLabs)", "OCR (Azure Document Intelligence)", "LangChain (basic)"] },
     { label: "Cloud & DevOps", items: ["AWS (EC2 / S3 / CloudFront)", "Hostinger VPS", "Docker", "Nginx", "GitHub Actions CI/CD", "Let's Encrypt HTTPS"] },
+    { label: "Payments & APIs", items: ["Razorpay", "Stripe", "PayPal", "Coinbase", "WhatsApp Cloud API", "ABDM / ABHA", "Google Maps SDK", "AdMob"] },
     { label: "Testing & Tools", items: ["Jest", "Detox", "Postman", "Android Studio", "Git", "Swagger"] },
   ],
   experience: [
@@ -125,17 +125,53 @@ export const BASE: Resume = {
     },
   ],
   coreStrengths: [
-    "End-to-end ownership — Kotlin native modules → React Native UI → NestJS / Node APIs → PostgreSQL / Prisma → AWS.",
-    "Multi-tenant SaaS architecture — shared-DB and DB-per-tenant systems with isolation, RBAC, queues, and automated provisioning.",
-    "Public API design — OpenAPI surfaces, API-key management, partner integration layers, and developer documentation.",
-    "Real-time & offline-first systems — WebSocket / Socket.IO and offline SQLite with background sync & conflict resolution.",
-    "AI & voice integrations — OpenAI, Deepgram, ElevenLabs, and Pinecone for voice interviews, AI sourcing, and in-app assistants.",
-    "Proven delivery — built and maintained 10+ production apps with 1.5M+ combined downloads, plus a live independently built SaaS.",
+    "End-to-end ownership — Kotlin native modules → React Native / Next.js UI → NestJS APIs → PostgreSQL / Prisma → AWS.",
+    "Multi-tenant SaaS architecture — shared-DB and database-per-tenant systems with isolation, RBAC, queues and automated provisioning.",
+    "Public API design — OpenAPI gateways, API-key authentication, partner integrations and developer documentation.",
+    "Real-time & offline-first systems — WebSocket / Socket.IO streaming and offline SQLite with background sync and conflict resolution.",
+    "Applied AI — RAG (chunking, embeddings, vector search), LLM evaluation, STT / TTS voice agents and OCR document extraction.",
+    "Production track record — a live SaaS in production and 10+ apps built or maintained with 1.5M+ combined downloads.",
   ],
   education: [
     { deg: "Master of Computer Applications (MCA)", inst: "Rajasthan Technical University (RTU), Kota — Correspondence / Distance Mode (completed alongside full-time employment)", date: "Aug 2024 – May 2026" },
     { deg: "Bachelor of Computer Applications (BCA)", inst: "Mohanlal Sukhadia University (MLSU), Udaipur", date: "Aug 2021 – Jul 2024" },
   ],
+  /* Role-specific headline + summary. Every claim here also appears in the
+     experience below — positionResume() swaps these in and reorders sections. */
+  positioning: {
+    fullstack: {
+      title: "Full-Stack Engineer",
+      subtitle: "React / Next.js | Node.js / NestJS | TypeScript | PostgreSQL | AWS",
+      summary: [
+        "Full-Stack Engineer with 2+ years of experience building web products end to end — React / Next.js frontends, TypeScript and Node.js / NestJS APIs, PostgreSQL / Prisma data models, Redis / BullMQ queues and Dockerized AWS deployments.",
+        "Built and operate Clinic Cloud, a live multi-tenant healthcare SaaS with 27+ feature modules and a Next.js staff app, and engineered Interview AI, a database-per-tenant platform serving 6+ university tenants. Also designed a public OpenAPI gateway of 56+ REST endpoints, with additional React Native mobile experience.",
+      ],
+    },
+    backend: {
+      title: "Backend Engineer (Node.js / NestJS)",
+      subtitle: "Node.js | NestJS | TypeScript | PostgreSQL | Redis / BullMQ | AWS",
+      summary: [
+        "Backend Engineer with 2+ years of experience designing multi-tenant SaaS backends and public APIs in Node.js / NestJS and TypeScript — PostgreSQL / Prisma data models, Redis / BullMQ job queues, real-time WebSockets and Dockerized AWS deployments.",
+        "Architected Interview AI's database-per-tenant platform (6+ university tenants, automated provisioning) and Clinic Cloud, a live healthcare SaaS with 27+ modules, 80+ Prisma models and India's ABDM/ABHA integration. Built a public OpenAPI gateway of 56+ REST endpoints consumed by 10+ client integrations.",
+      ],
+    },
+    mobile: {
+      title: "Mobile Engineer (React Native & Kotlin)",
+      subtitle: "React Native | Kotlin Native Modules | TypeScript | Offline-first | Play Store & App Store",
+      summary: [
+        "Mobile Engineer with 2+ years of experience who has built and maintained 10+ production apps with 1.5M+ combined downloads on Google Play and the App Store — React Native with custom Kotlin native modules, offline-first data, real-time features and end-to-end store releases.",
+        "Built a call-tracking CRM whose Kotlin modules captured 5,000+ call logs with zero data loss, built core features for a social app with 100K+ downloads, and maintained government utility apps with 1M+ and 500K+ downloads. Backed by Node.js / NestJS experience to own features from native module to API.",
+      ],
+    },
+    ai: {
+      title: "AI Engineer (LLM, RAG & Voice AI)",
+      subtitle: "LLMs | RAG & Embeddings | Vector DB | STT / TTS | OCR | Node.js / NestJS",
+      summary: [
+        "AI Engineer with 2+ years of software experience building production LLM and voice-AI applications — RAG pipelines (chunking, embeddings, Pinecone vector search), LLM-based evaluation, speech-to-text / text-to-speech voice agents and OCR document extraction, running on Node.js / NestJS backends.",
+        "Built Interview AI, a voice-interview platform (STT → LLM → TTS) serving 6+ university tenants with 70+ AI interviews conducted, and a public voice-AI API gateway with 56+ REST endpoints used by 10+ client integrations. Also shipped AI features in mobile apps: a Deepgram voice-to-job assistant and NLP sentiment analysis on 2,000+ call recordings.",
+      ],
+    },
+  },
 };
 
 export const PROFILE_DEFAULT: Profile = {

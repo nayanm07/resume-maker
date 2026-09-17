@@ -12,6 +12,12 @@ export interface Job {
 }
 export interface Education { deg: string; inst: string; date: string; }
 
+/** Which kind of role the resume is being positioned for. */
+export type RoleFocus = "balanced" | "fullstack" | "backend" | "mobile" | "ai";
+
+/** Hand-written, fact-checked headline/summary for one role focus. */
+export interface RoleVariant { title?: string; subtitle?: string; summary?: string[]; }
+
 export interface Resume {
   name: string; title: string; subtitle: string;
   contact: Contact;
@@ -20,6 +26,8 @@ export interface Resume {
   experience: Job[];
   coreStrengths: string[];
   education: Education[];
+  /** optional per-role headline + summary; applied by positionResume() */
+  positioning?: Partial<Record<RoleFocus, RoleVariant>>;
 }
 
 /* ---------- AI payloads ---------- */
@@ -78,6 +86,7 @@ export type PromptKey =
   | "parseSystem"
   | "gapSystem"
   | "generateIntro"
+  | "roleFocusRule"
   | "resumeRule"
   | "skillWeaveRule"
   | "atsRule"
