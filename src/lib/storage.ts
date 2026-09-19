@@ -12,6 +12,7 @@ export const KEYS = {
   locks: "rt2_locks",
   prompts: "rt2_prompts",
   baseResume: "rt2_base_resume",
+  jobPrefs: "rt2_job_prefs",
 } as const;
 
 export function read<T>(key: string, fallback: T): T {

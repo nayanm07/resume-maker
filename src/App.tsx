@@ -9,7 +9,7 @@ import { BASE, PROFILE_DEFAULT } from "./data/baseResume";
 import { PROVIDERS } from "./lib/providers";
 import { callLLM, parseJSON } from "./lib/llm";
 import {
-  gapPrompt, generatePrompt, parseSystem, qaAskSystem, qaContext, qaPredictSystem,
+  gapPrompt, generatePrompt, jobQueryPrompt, parseSystem, qaAskSystem, qaContext, qaPredictSystem,
 } from "./lib/prompts";
 import {
   ALL_UNLOCKED, clone, defaultVersionName, detectEmails, diffResume, experienceTargets, fixNameCase, pdfFileName, titleCase,
@@ -27,12 +27,14 @@ import { VersionsTab } from "./components/tabs/VersionsTab";
 import { TrackerTab } from "./components/tabs/TrackerTab";
 import { PromptsTab } from "./components/tabs/PromptsTab";
 import { MyResumeTab } from "./components/tabs/MyResumeTab";
+import { JobSearchTab } from "./components/tabs/JobSearchTab";
+import { JOB_PREFS_DEFAULT, type JobPrefs } from "./lib/jobSearch";
 import {
   coerceResume, extractText, parseUserPrompt,
 } from "./lib/resumeImport";
 
 type TabId =
-  | "mine" | "gap" | "resume" | "diff" | "ats" | "email"
+  | "mine" | "jobs" | "gap" | "resume" | "diff" | "ats" | "email"
   | "whatsapp" | "dm" | "comment" | "qa" | "versions" | "tracker" | "prompts";
 
 const WANT_DEFAULT: WantMap = {
@@ -53,6 +55,8 @@ export default function App() {
   );
   const [locks, setLocks] = usePersisted<SectionLocks>(KEYS.locks, ALL_UNLOCKED, true);
   const [prompts, setPrompts] = usePersisted<Partial<PromptTemplates>>(KEYS.prompts, {});
+  const [jobPrefs, setJobPrefs] = usePersisted<JobPrefs>(KEYS.jobPrefs, JOB_PREFS_DEFAULT, true);
+  const [suggestingRoles, setSuggestingRoles] = useState(false);
 
   /** The user's master resume. Falls back to the bundled sample until they add their own. */
   const [storedBase, setStoredBase] = usePersisted<Resume | null>(KEYS.baseResume, null);
@@ -320,6 +324,31 @@ export default function App() {
   };
 
   const setMyResume = (r: Resume) => { setStoredBase(r); setTailored(false); };
+
+  /* ---------------- find jobs ---------------- */
+  // My Details defaults to the built-in roles; don't suggest those for someone else's resume
+  const useProfileRoles = !isOwn || profile.roles !== PROFILE_DEFAULT.roles;
+  const suggestJobRoles = async () => {
+    if (!cfg.key) return toast.err(`Add your ${PROVIDERS[provider].label} API key first (left panel).`);
+    setSuggestingRoles(true);
+    try {
+      const { system, user } = jobQueryPrompt(base, profile, prompts);
+      const d = parseJSON<{ roles?: unknown; skills?: unknown }>(await ask(system, user, 0.2));
+      const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && !!x.trim()) : []);
+      const roles = strings(d.roles).slice(0, 8);
+      if (!roles.length) throw new Error("No roles returned.");
+      setJobPrefs({ ...jobPrefs, aiRoles: roles, aiSkills: strings(d.skills).slice(0, 8), picked: roles.slice(0, 3) });
+      toast.ok(`Suggested ${roles.length} search roles from your resume.`);
+    } catch (e: any) {
+      toast.err(`Suggest failed: ${e.message}`);
+    } finally {
+      setSuggestingRoles(false);
+    }
+  };
+  const useRoleAsTarget = (role: string) => {
+    setTarget(role);
+    toast.ok(`Target role set to "${role}" — your resume is now positioned and named for it.`);
+  };
   const useBuiltInResume = () => { setStoredBase(null); setTailored(false); setGap(null); setPicked({}); };
 
   /* ---------------- editor helpers ---------------- */
@@ -347,6 +376,7 @@ export default function App() {
   /* ---------------- tabs ---------------- */
   const TABS: { id: TabId; label: string; badge?: number }[] = [
     { id: "mine", label: isOwn ? "👤 My Resume" : "👤 My Resume ⚠️" },
+    { id: "jobs", label: "🔎 Find Jobs" },
     { id: "gap", label: "🔍 Skill Gap" },
     { id: "resume", label: "📄 Resume" },
     { id: "diff", label: "🔀 Changes", badge: diff.length || undefined },
@@ -420,6 +450,19 @@ export default function App() {
                 onParseText={parseResumeText}
                 onUseBuiltIn={useBuiltInResume}
                 onError={(m) => toast.err(m)}
+              />
+            )}
+
+            {tab === "jobs" && (
+              <JobSearchTab
+                base={base}
+                profile={profile}
+                prefs={jobPrefs}
+                setPrefs={setJobPrefs}
+                useProfileRoles={useProfileRoles}
+                suggesting={suggestingRoles}
+                onSuggest={suggestJobRoles}
+                onUseRole={useRoleAsTarget}
               />
             )}
 

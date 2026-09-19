@@ -59,6 +59,11 @@ const SIGNALS: Record<Focus, RegExp[]> = {
   ],
 };
 
+/** Keyword-signal score of `text` for one focus (exported for job search). */
+export function scoreFocus(text: string, focus: Focus): number {
+  return score(text, focus);
+}
+
 function score(text: string, focus: Focus): number {
   const t = (text || "").toLowerCase();
   return SIGNALS[focus].reduce((n, re) => n + (t.match(re)?.length ?? 0), 0);

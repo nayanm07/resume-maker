@@ -93,7 +93,8 @@ export type PromptKey =
   | "emailRule"
   | "outreachRule"
   | "qaSectionRule"
-  | "qaRules";
+  | "qaRules"
+  | "jobQuerySystem";
 export type PromptTemplates = Record<PromptKey, string>;
 
 export interface SavedVersion {
