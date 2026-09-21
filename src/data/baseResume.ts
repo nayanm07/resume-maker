@@ -112,9 +112,10 @@ export const BASE: Resume = {
             },
             {
               title: "EL-Pico — Club Automation",
-              meta: "React Native · Stripe & Coinbase (crypto) payments",
+              meta: "React Native + Node.js · real-time slot booking · Stripe & Coinbase (crypto)",
               bullets: [
-                "Developed membership management, event workflows, and a real-time booking system with Stripe and Coinbase (crypto) payments.",
+                "Built the Node.js backend for the real-time slot-booking module — slot selection, live availability and session-based slot locking that holds a slot while the member completes checkout, so two members can never book the same slot.",
+                "Developed membership management, event workflows and the booking UI in React Native, with Stripe and Coinbase (crypto) payments.",
               ],
             },
           ],
@@ -124,8 +125,9 @@ export const BASE: Resume = {
           projects: [
             {
               title: "Supraa — Grocery Delivery",
-              meta: "React Native · checkout, GST, live order tracking",
+              meta: "React Native + Node.js · Socket.IO live tracking · checkout & GST",
               bullets: [
+                "Built real-time delivery-partner tracking end to end — a background activity in the React Native app that keeps streaming the partner's location while the app is in the background, and a Socket.IO backend that pushes it live to the customer's order screen.",
                 "Engineered a full checkout system with discount/GST calculation, quick-commerce ordering, geolocation-based listings, and real-time order tracking.",
               ],
             },
