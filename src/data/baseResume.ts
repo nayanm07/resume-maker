@@ -30,7 +30,7 @@ export const BASE: Resume = {
   experience: [
     {
       company: "Edysor.ai",
-      role: "Full-Stack Mobile & Backend Engineer",
+      role: "Full-Stack Engineer",
       date: "Oct 2025 – Present",
       place: "Udaipur, Rajasthan · Mobile apps & backend platforms across edtech, AI-voice, and recruitment products.",
       groups: [
@@ -42,7 +42,7 @@ export const BASE: Resume = {
               meta: "React Native + Kotlin Native Modules + Real-Time WebSocket",
               bullets: [
                 "Built Kotlin native modules with Android Broadcast Receivers that captured 100% of inbound/outbound calls — 5,000+ call logs with zero data loss — plus web-to-mobile click-to-call triggered by real-time WebSocket events through a background foreground service.",
-                "Implemented a Truecaller-style real-time lead overlay that matches any call to a CRM lead with live context and quick actions, and a call-recording pipeline that has processed 2,000+ recordings with transcripts and NLP sentiment analysis (emotion timeline, talk/silence ratio, action items), backed by an offline retry queue.",
+                "Implemented a Truecaller-style real-time lead overlay that matches any call to a CRM lead with live context and quick actions, and a call-recording pipeline that has processed 2,000+ recordings with transcripts and NLP sentiment analysis (emotion timeline, talk/silence ratio), backed by an offline retry queue.",
                 "Designed an offline-first architecture using SQLite with background sync and conflict resolution — 300+ leads created and managed in production — with real-time team switching that invalidates team-scoped caches and re-subscribes native socket services.",
               ],
             },
@@ -64,7 +64,8 @@ export const BASE: Resume = {
               meta: "NestJS, Prisma, Redis/BullMQ, OpenAI, Pinecone, Next.js",
               bullets: [
                 "Engineered a database-per-tenant architecture (AsyncLocalStorage tenant resolution + LRU connection pool) with fully automated provisioning and migrations — live in production with 6+ university tenants, 300+ students onboarded, and 70+ AI mock interviews conducted.",
-                "Built an end-to-end AI interview pipeline — STT → LLM evaluation → TTS, Azure Document Intelligence OCR for ID verification, and vector search over the question bank and transcript (pgvector + Pinecone, per-tenant namespaces) — scoring every answer correct or incorrect and emailing the student an automated PDF report, all processed asynchronously via idempotent, retryable BullMQ workers.",
+                "Built an end-to-end AI interview pipeline — STT → LLM evaluation → TTS, Azure Document Intelligence OCR for ID verification, and vector search over the question bank and transcript (pgvector + Pinecone, per-tenant namespaces) — scoring every answer correct/incorrect and emailing the student a PDF report, on idempotent, retryable BullMQ workers.",
+                "Built a WhatsApp AI assistant on the Meta Cloud API that answers student queries and books interview slots, using LangChain with vector-DB retrieval over each university's content.",
                 "Developed the React / Next.js frontend — admin dashboards, student onboarding and document upload, interview reporting UI, a bulk email-campaign tool with customisable templates, and live proctoring during the interview: screen recording, real-time emotion and eye-contact detection, and photo capture.",
               ],
             },
@@ -89,7 +90,7 @@ export const BASE: Resume = {
         "Architected a multi-tenant healthcare SaaS serving multiple isolated clinics across 27+ feature modules from a single NestJS deployment — header-based tenant isolation, JWT + OTP auth, fine-grained RBAC, and subscription-feature gating.",
         "Integrated India's ABDM/ABHA national health-record system end-to-end: HIP bridge services, ABHA patient creation, scan-and-share consent flows, QR generation, and server-to-server callbacks.",
         "Built real-time appointment booking (Socket.IO, token-based slots, holiday/leave validation) and a multi-language WhatsApp Cloud API bot for bookings, reminders, payment links, and QR check-in on BullMQ queues.",
-        "Shipped Razorpay subscription billing with webhooks and automated invoice PDFs to S3; scaled a Prisma layer of 80+ models / 39+ migrations with a Redis caching layer for hot clinic, permission, and certificate data.",
+        "Shipped Razorpay subscription billing with webhooks and automated invoice PDFs to S3; scaled a Prisma layer of 80+ models / 39+ migrations with Redis caching for hot clinic and permission data.",
         "Built the React / Next.js web application for clinic staff and admins — appointments, patient records, billing, and analytics — consuming the multi-tenant API with role-based UI gating.",
         "Operate Dockerized CI/CD to AWS EC2 via GitHub Actions with Nginx, Let's Encrypt HTTPS, and zero-downtime migrations.",
       ],

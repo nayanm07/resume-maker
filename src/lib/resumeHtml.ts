@@ -78,7 +78,7 @@ export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
    comes from .body padding repeated per page (box-decoration-break). */
 @page{ size:A4; margin:0; }
 html,body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--ink); font-size:10.9px; line-height:1.45; }
+body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--ink); font-size:10.8px; line-height:1.44; }
 mark{ background:#fff3bf; color:inherit; padding:0 1px; border-radius:2px; }
 .band{ background:var(--navy); color:#fff; display:flex; justify-content:space-between; align-items:center; gap:26px; padding:26px 34px; }
 .band .name{ font-size:33px; font-weight:300; letter-spacing:3px; line-height:1; }
