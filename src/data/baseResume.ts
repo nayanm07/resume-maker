@@ -133,9 +133,10 @@ export const BASE: Resume = {
             },
             {
               title: "BigValue — Travel App",
-              meta: "React Native · third-party travel APIs · PayPal & Razorpay",
+              meta: "React Native + Node.js · Thomalex & Riya flight APIs · PayPal & Razorpay",
               bullets: [
-                "Built a flight booking module (one-way / round-trip / multi-city) integrating third-party travel APIs with PayPal and Razorpay.",
+                "Built the flight-booking backend service, integrating the Thomalex and Riya travel APIs for real-time flight search, fare and seat-availability data.",
+                "Built the flight booking module (one-way / round-trip / multi-city) in React Native with PayPal and Razorpay payments.",
               ],
             },
             {
