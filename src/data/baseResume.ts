@@ -95,24 +95,63 @@ export const BASE: Resume = {
       ],
     },
     {
-      company: "MetaStart via WebSenor Pvt. Ltd.",
-      role: "React Native Developer (Contract)",
-      date: "May 2025 – Oct 2025",
-      bullets: [
-        "MyFlama (Social App · 100K+ downloads): built a reels-style short-video feed with optimized rendering for smooth playback on mid-range devices, real-time chat, Google Maps live location tracking, AdMob ads, and Firebase push notifications.",
-        "EL-Pico (Club Automation): developed membership management, event workflows, and a real-time booking system with Stripe & Coinbase (crypto) payments.",
-      ],
-    },
-    {
       company: "WebSenor Private Limited",
-      role: "React Native Developer",
-      date: "Sep 2024 – May 2025",
-      bullets: [
-        "BRPL & BYPL (Govt Utility Apps · 1M+ and 500K+ downloads): maintained two of Delhi's electricity-provider apps serving millions of consumers — bug fixes, dependency/SDK upgrades, and Play Store release updates.",
-        "Housecaller (Home Services · 10K+ downloads): built the customer app for booking verified home-service professionals — service discovery, scheduling, and booking tracking.",
-        "Supraa (Grocery Delivery): engineered a full checkout system with discount/GST calculation, quick-commerce ordering, geolocation-based listings, and real-time order tracking.",
-        "BigValue (Travel App): built a flight booking module (one-way / round-trip / multi-city) integrating third-party travel APIs with PayPal and Razorpay.",
-        "Maintained production apps: Peclick, SoulSpace, Real Sampada — ongoing fixes, compatibility updates, and store releases.",
+      role: "React Native + Node.js Developer",
+      date: "Sep 2024 – Oct 2025",
+      place: "Udaipur, Rajasthan · React Native apps across WebSenor products and client assignments, including a client assignment at MetaStart.",
+      groups: [
+        {
+          track: "MetaStart — Client Assignment · May 2025 – Oct 2025",
+          projects: [
+            {
+              title: "MyFlama — Social App",
+              meta: "React Native · Android & iOS · 100K+ downloads",
+              bullets: [
+                "Built a reels-style short-video feed with optimized rendering for smooth playback on mid-range devices, real-time chat, Google Maps live location tracking, AdMob ads, and Firebase push notifications.",
+              ],
+            },
+            {
+              title: "EL-Pico — Club Automation",
+              meta: "React Native · Stripe & Coinbase (crypto) payments",
+              bullets: [
+                "Developed membership management, event workflows, and a real-time booking system with Stripe and Coinbase (crypto) payments.",
+              ],
+            },
+          ],
+        },
+        {
+          track: "WebSenor — Product & Client Apps · Sep 2024 – May 2025",
+          projects: [
+            {
+              title: "Supraa — Grocery Delivery",
+              meta: "React Native · checkout, GST, live order tracking",
+              bullets: [
+                "Engineered a full checkout system with discount/GST calculation, quick-commerce ordering, geolocation-based listings, and real-time order tracking.",
+              ],
+            },
+            {
+              title: "BigValue — Travel App",
+              meta: "React Native · third-party travel APIs · PayPal & Razorpay",
+              bullets: [
+                "Built a flight booking module (one-way / round-trip / multi-city) integrating third-party travel APIs with PayPal and Razorpay.",
+              ],
+            },
+            {
+              title: "Housecaller — Home Services",
+              meta: "React Native · Android & iOS · 10K+ downloads",
+              bullets: [
+                "Built the customer app for booking verified home-service professionals — service discovery, scheduling, and booking tracking.",
+              ],
+            },
+            {
+              title: "BRPL & BYPL — Govt Utility Apps",
+              meta: "Delhi electricity providers · 1M+ and 500K+ downloads",
+              bullets: [
+                "Maintained two of Delhi's electricity-provider apps serving millions of consumers — bug fixes, dependency/SDK upgrades and Play Store release updates — plus ongoing maintenance of Peclick, SoulSpace and Real Sampada.",
+              ],
+            },
+          ],
+        },
       ],
     },
     {

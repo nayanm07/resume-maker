@@ -147,10 +147,15 @@ export function positionResume(base: Resume, focus: RoleFocus): Resume {
   r.experience = r.experience.map((j) => {
     const job = { ...j };
     if (job.groups) {
-      job.groups = byScore(
-        job.groups.map((g) => ({ ...g, projects: byScore(g.projects, (p) => s(projText(p))) })),
-        (g) => s(`${g.track} ${g.projects.map(projText).join(" ")}`)
-      );
+      const withSortedProjects = job.groups.map((g) => ({
+        ...g, projects: byScore(g.projects, (p) => s(projText(p))),
+      }));
+      // tracks that carry their own dates ("… · May 2025 – Oct 2025") are time
+      // periods, so they stay chronological; discipline tracks reorder by relevance
+      const dated = job.groups.some((g) => /(^|[^0-9])20[0-9]{2}([^0-9]|$)/.test(g.track));
+      job.groups = dated
+        ? withSortedProjects
+        : byScore(withSortedProjects, (g) => s(`${g.track} ${g.projects.map(projText).join(" ")}`));
     }
     if (job.bullets) job.bullets = byScore(job.bullets, s);
     return job;
