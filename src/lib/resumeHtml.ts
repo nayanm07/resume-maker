@@ -87,7 +87,7 @@ mark{ background:#fff3bf; color:inherit; padding:0 1px; border-radius:2px; }
 .contact{ text-align:right; font-size:9.2px; } .contact div{ margin-bottom:5px; color:#eaf1f8; }
 .contact a{ color:#cfe0f2; text-decoration:none; }
 .body{ padding:22px 34px 30px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
-h2{ font-size:12.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1.5px; padding-bottom:4px; margin:13px 0 7px; border-bottom:2px solid var(--navy); }
+h2{ font-size:12.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1.5px; padding-bottom:4px; margin:11px 0 6px; border-bottom:2px solid var(--navy); }
 h2:first-child{ margin-top:0; } p.summary{ text-align:justify; margin-bottom:6px; }
 .skill{ display:flex; gap:10px; margin-bottom:5px; align-items:baseline; }
 .skill b{ color:var(--navy); min-width:122px; flex:none; font-size:10px; }
@@ -102,9 +102,9 @@ h2:first-child{ margin-top:0; } p.summary{ text-align:justify; margin-bottom:6px
 .jh .co{ font-size:12px; font-weight:700; } .jh .co .r{ font-style:italic; font-weight:400; font-size:10px; }
 .jh .date{ color:var(--muted); font-size:9px; white-space:nowrap; padding-left:10px; font-weight:600; }
 .place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1px 0 2px; }
-.track{ font-size:9.2px; font-weight:700; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin:7px 0 1px; }
-.proj{ font-size:10.2px; margin-top:5px; break-after:avoid; } .proj b{ color:var(--ink); } .proj span{ color:var(--soft); font-style:italic; }
-ul{ list-style:none; margin:2px 0 0; } li{ position:relative; padding-left:14px; margin-bottom:2px; break-inside:avoid; }
+.track{ font-size:9.2px; font-weight:700; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin:6px 0 1px; }
+.proj{ font-size:10.2px; margin-top:4px; break-after:avoid; } .proj b{ color:var(--ink); } .proj span{ color:var(--soft); font-style:italic; }
+ul{ list-style:none; margin:2px 0 0; } li{ position:relative; padding-left:14px; margin-bottom:1px; break-inside:avoid; }
 li::before{ content:""; position:absolute; left:1px; top:6px; width:5px; height:5px; background:var(--accent); border-radius:50%; }
 ul.strengths li::before{ background:var(--navy); }
 .edu{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }

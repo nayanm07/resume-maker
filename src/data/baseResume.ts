@@ -22,7 +22,7 @@ export const BASE: Resume = {
     { label: "Frontend", items: ["React", "Next.js", "TypeScript", "JavaScript (ES6+)", "Redux Toolkit (RTK Query)", "Axios", "Zod", "Formik"] },
     { label: "Backend", items: ["Node.js", "NestJS", "Express.js", "PostgreSQL", "MySQL", "MongoDB", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
     { label: "Mobile", items: ["React Native", "Kotlin (Native Modules)", "Offline-first SQLite", "Firebase (FCM)", "Google Play Console", "App Store Connect"] },
-    { label: "AI & Voice", items: ["LLMs (OpenAI)", "RAG", "Embeddings", "Chunking", "Vector DB (Pinecone)", "STT (Deepgram)", "TTS (ElevenLabs)", "OCR (Azure Document Intelligence)", "LangChain (basic)"] },
+    { label: "AI & Voice", items: ["LLMs (OpenAI, Gemini)", "RAG(Pinecone, pgvector)", "Embeddings(OpenAI, Deepgram)", "Chunking", "Vector DB (Pinecone, pgvector)", "STT (Deepgram , Whisper)", "TTS (ElevenLabs)", "OCR (Azure Document Intelligence)", "LangChain (basic)"] },
     { label: "Cloud & DevOps", items: ["AWS (EC2 / S3 / CloudFront)", "Hostinger VPS", "Docker", "Nginx", "GitHub Actions CI/CD", "Let's Encrypt HTTPS"] },
     { label: "Payments & APIs", items: ["Razorpay", "Stripe", "PayPal", "Coinbase", "WhatsApp Cloud API", "ABDM / ABHA", "Google Maps SDK", "AdMob"] },
     { label: "Testing & Tools", items: ["Jest", "Detox", "Postman", "Android Studio", "Git", "Swagger"] },
@@ -41,7 +41,7 @@ export const BASE: Resume = {
               title: "B2C CRM — Study Abroad Lead Management",
               meta: "React Native + Kotlin Native Modules + Real-Time WebSocket",
               bullets: [
-                "Built Kotlin Native Modules bridged with React Native, implementing Android Broadcast Receivers that captured 100% of inbound/outbound calls — 5,000+ call logs collected with zero data loss — plus web-to-mobile click-to-call triggered by real-time WebSocket events through a background foreground service.",
+                "Built Kotlin native modules with Android Broadcast Receivers that captured 100% of inbound/outbound calls — 5,000+ call logs with zero data loss — plus web-to-mobile click-to-call triggered by real-time WebSocket events through a background foreground service.",
                 "Implemented a Truecaller-style real-time lead overlay that matches any call to a CRM lead with live context and quick actions, and a call-recording pipeline that has processed 2,000+ recordings with transcripts and NLP sentiment analysis (emotion timeline, talk/silence ratio, action items), backed by an offline retry queue.",
                 "Designed an offline-first architecture using SQLite with background sync and conflict resolution — 300+ leads created and managed in production — with real-time team switching that invalidates team-scoped caches and re-subscribes native socket services.",
               ],
@@ -64,16 +64,16 @@ export const BASE: Resume = {
               meta: "NestJS, Prisma, Redis/BullMQ, OpenAI, Pinecone, Next.js",
               bullets: [
                 "Engineered a database-per-tenant architecture (AsyncLocalStorage tenant resolution + LRU connection pool) with fully automated provisioning and migrations — live in production with 6+ university tenants, 300+ students onboarded, and 70+ AI mock interviews conducted.",
-                "Built an end-to-end AI interview pipeline — STT → LLM evaluation → TTS, Azure Document Intelligence OCR for ID verification, Pinecone RAG over per-tenant namespaces, and automated PDF reports — processed asynchronously via idempotent, retryable BullMQ workers.",
-                "Developed the React / Next.js web frontend — university admin dashboards, student onboarding and document upload, and interview reporting UI — integrated with the multi-tenant API.",
+                "Built an end-to-end AI interview pipeline — STT → LLM evaluation → TTS, Azure Document Intelligence OCR for ID verification, and vector search over the question bank and transcript (pgvector + Pinecone, per-tenant namespaces) — scoring every answer correct or incorrect and emailing the student an automated PDF report, all processed asynchronously via idempotent, retryable BullMQ workers.",
+                "Developed the React / Next.js frontend — admin dashboards, student onboarding and document upload, interview reporting UI, a bulk email-campaign tool with customisable templates, and live proctoring during the interview: screen recording, real-time emotion and eye-contact detection, and photo capture.",
               ],
             },
             {
               title: "Sicada AI — Voice API Platform (Public OpenAPI Layer)",
               meta: "Node.js, TypeScript, REST / OpenAPI, API-Key Auth",
               bullets: [
-                "Designed and built the public OpenAPI gateway (56+ REST endpoints) that lets third-party software run AI voice-calling campaigns programmatically — Agents, Campaigns, Knowledge Bases (RAG), Phone Numbers, Scheduled Calls, conversations & transcripts, provider discovery (TTS/LLM/STT), and billing/usage — actively consumed by 10+ external client integrations.",
-                "Built API-key issuance, management, and per-request authentication so partner software integrates without interactive login, securely orchestrating external voice/telephony services behind the gateway; authored a self-contained, searchable developer API reference.",
+                "Designed and built the public OpenAPI gateway (56+ REST endpoints) that lets third-party software run AI voice-calling campaigns — agents, campaigns, knowledge bases (RAG), phone numbers, scheduled calls, transcripts, provider discovery and billing — actively consumed by 10+ external client integrations.",
+                "Built API-key issuance, management, and per-request authentication so partner software integrates without interactive login, securely orchestrating external voice/telephony services behind the gateway; built the endpoints to India's DPDP data-protection requirements and authored a searchable developer API reference.",
               ],
             },
           ],
@@ -84,7 +84,7 @@ export const BASE: Resume = {
       company: "Clinic Cloud",
       role: "Independent Project (Solo Developer)",
       date: "Live in Production",
-      place: "goclinic.online · Live multi-tenant healthcare SaaS built end-to-end on personal time · NestJS, Prisma, PostgreSQL, Redis, React / Next.js, AWS.",
+      place: "goclinic.online · Built and operated end-to-end on personal time · NestJS, Prisma, PostgreSQL, Redis, React / Next.js, AWS.",
       bullets: [
         "Architected a multi-tenant healthcare SaaS serving multiple isolated clinics across 27+ feature modules from a single NestJS deployment — header-based tenant isolation, JWT + OTP auth, fine-grained RBAC, and subscription-feature gating.",
         "Integrated India's ABDM/ABHA national health-record system end-to-end: HIP bridge services, ABHA patient creation, scan-and-share consent flows, QR generation, and server-to-server callbacks.",
