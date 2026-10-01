@@ -132,6 +132,21 @@ export const EMPHASIS: { id: EmphasisMode; label: string; note: string }[] = [
 export const isEmphasis = (v: unknown): v is EmphasisMode =>
   EMPHASIS.some((e) => e.id === v);
 
+/* ------------------------------------------------------------------ */
+/* Text size                                                           */
+/* ------------------------------------------------------------------ */
+
+export const SCALE_MIN = 0.8;
+export const SCALE_MAX = 1.2;
+export const SCALE_STEP = 0.05;
+
+export const clampScale = (n: unknown): number => {
+  const v = typeof n === "number" && Number.isFinite(n) ? n : 1;
+  // round to the step so repeated +/- cannot drift to 0.9000000000000001
+  const stepped = Math.round(v / SCALE_STEP) * SCALE_STEP;
+  return Math.min(SCALE_MAX, Math.max(SCALE_MIN, Number(stepped.toFixed(2))));
+};
+
 export const A4_W = 794;
 export const A4_H = 1123;
 
@@ -414,13 +429,20 @@ export function renderResumeHtml(
   d: Resume,
   keywords: string[] = [],
   template: TemplateId = "classic",
-  emphasis: EmphasisMode = "metrics"
+  emphasis: EmphasisMode = "metrics",
+  scale = 1
 ): string {
   const hl = (t: string) => highlight(t, keywords);
   const { body, contactBits } = sections(d, hl, emphasis);
   const contact = contactBits.join('<span class="sep">·</span>');
 
-  const head = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE_CSS}${CSS[template]}</style></head><body>`;
+  /* `zoom` rather than `transform: scale()`: zoom reflows the text, so lines
+     re-wrap and the page count genuinely changes. A transform would only
+     shrink the picture and still print the same number of pages. */
+  const s = clampScale(scale);
+  const zoom = s === 1 ? "" : `body{ zoom:${s}; }`;
+
+  const head = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE_CSS}${CSS[template]}${zoom}</style></head><body>`;
 
   const headline = `
     <div class="name">${esc(d.name)}</div>

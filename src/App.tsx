@@ -20,7 +20,7 @@ import { Button, Card, Toasts, useToasts } from "./components/ui";
 import { Sidebar } from "./components/Sidebar";
 import { ResumePreview, type PreviewHandle } from "./components/ResumePreview";
 import {
-  EMPHASIS, TEMPLATES, isEmphasis, isTemplate,
+  EMPHASIS, SCALE_MAX, SCALE_MIN, SCALE_STEP, TEMPLATES, clampScale, isEmphasis, isTemplate,
   type EmphasisMode, type TemplateId,
 } from "./lib/resumeHtml";
 import { ResumeEditor } from "./components/ResumeEditor";
@@ -66,6 +66,9 @@ export default function App() {
   // guards against an old or hand-edited localStorage value naming an option that no longer exists
   const template: TemplateId = isTemplate(templateRaw) ? templateRaw : "classic";
   const emphasis: EmphasisMode = isEmphasis(emphasisRaw) ? emphasisRaw : "metrics";
+  const [scaleRaw, setScale] = usePersisted<number>(KEYS.scale, 1);
+  const scale = clampScale(scaleRaw);
+  const nudgeScale = (d: number) => setScale(clampScale(scale + d));
   const [suggestingRoles, setSuggestingRoles] = useState(false);
 
   /** The user's master resume. Falls back to the bundled sample until they add their own. */
@@ -548,6 +551,32 @@ export default function App() {
                   </span>
                 </div>
 
+                <div className="tplbar">
+                  <span className="tpllbl">Text size</span>
+                  <button
+                    className="tplbtn" title="Smaller text — fits more on the page"
+                    disabled={scale <= SCALE_MIN}
+                    onClick={() => nudgeScale(-SCALE_STEP)}
+                  >
+                    A−
+                  </button>
+                  <span className="tplpct">{Math.round(scale * 100)}%</span>
+                  <button
+                    className="tplbtn" title="Bigger text — easier to read"
+                    disabled={scale >= SCALE_MAX}
+                    onClick={() => nudgeScale(SCALE_STEP)}
+                  >
+                    A+
+                  </button>
+                  {scale !== 1 && (
+                    <button className="tplbtn" onClick={() => setScale(1)}>↺ Reset</button>
+                  )}
+                  <span className="tplnote">
+                    Resizes the whole resume and re-wraps the text, so the printed page
+                    count really changes — not just the preview.
+                  </span>
+                </div>
+
                 <div className={`stage ${editing ? "editing" : ""}`}>
                   {editing && (
                     <ResumeEditor
@@ -563,6 +592,7 @@ export default function App() {
                     keywords={keywords}
                     template={template}
                     emphasis={emphasis}
+                    scale={scale}
                     onReady={(h) => { previewRef.current = h; }}
                   />
                 </div>

@@ -15,12 +15,14 @@ export interface PreviewHandle {
  * never collapse to scale(0).
  */
 export function ResumePreview({
-  resume, keywords = [], template = "classic", emphasis = "metrics", onReady,
+  resume, keywords = [], template = "classic", emphasis = "metrics", scale: textScale = 1, onReady,
 }: {
   resume: Resume;
   keywords?: string[];
   template?: TemplateId;
   emphasis?: EmphasisMode;
+  /** resume text size, 0.8–1.2; separate from the preview's fit-to-column scale */
+  scale?: number;
   onReady?: (h: PreviewHandle) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -28,8 +30,8 @@ export function ResumePreview({
   const [scale, setScale] = useState(1);
 
   const html = useMemo(
-    () => renderResumeHtml(resume, keywords, template, emphasis),
-    [resume, keywords, template, emphasis]
+    () => renderResumeHtml(resume, keywords, template, emphasis, textScale),
+    [resume, keywords, template, emphasis, textScale]
   );
 
   const fit = () => {
