@@ -276,8 +276,14 @@ p.summary{ text-align:justify; }
 /* auto-emphasis — weight only, so it survives a mono print */
 strong.m, strong.k{ font-weight:700; color:inherit; }
 .track, .proj, h2{ break-after:avoid; }
-ul{ list-style:none; margin:2px 0 0; }
-li{ position:relative; break-inside:avoid; }
+/* Native list markers, and nothing in here is positioned.
+   A positioned box paints in a later layer than in-flow boxes, and Chrome
+   writes the PDF text stream in paint order — so position:relative on li
+   made every bullet land after every heading in the extracted text, which is
+   what an ATS reads. Markers must come from list-style, not an absolutely
+   positioned ::before. */
+ul{ margin:2px 0 0; padding-left:12px; }
+li{ break-inside:avoid; }
 .edu{ display:flex; justify-content:space-between; align-items:baseline; break-inside:avoid; }
 .edu .date{ white-space:nowrap; padding-left:12px; }
 .hd a{ text-decoration:none; }
@@ -313,10 +319,11 @@ p.summary{ margin-bottom:5px; }
         margin:7px 0 2px; padding-bottom:1.5px; border-bottom:.6px solid var(--rule); }
 .proj{ font-size:10.1px; margin-top:4.5px; } .proj b{ color:var(--ink); font-weight:700; }
 .proj span{ color:var(--soft); font-style:italic; font-size:9.5px; }
-li{ padding-left:12px; margin-bottom:1.5px; }
 /* a small square prints crisper than a round dot at this size */
-li::before{ content:""; position:absolute; left:1px; top:5.2px; width:3.2px; height:3.2px; background:var(--ink); }
-ul.strengths li::before{ background:#fff; border:1px solid var(--ink); }
+ul{ list-style:square; }
+li{ margin-bottom:1.5px; }
+li::marker{ color:var(--ink); font-size:.72em; }
+ul.strengths{ list-style:circle; }
 .edu{ margin-bottom:3px; } .edu b{ font-size:10.1px; color:var(--ink); }
 .edu i{ color:var(--mid); font-style:italic; font-size:9.3px; }
 .edu .date{ color:var(--ink); font-size:9.2px; font-weight:700; }
@@ -340,8 +347,8 @@ p.summary{ margin-bottom:3px; }
 .job{ margin-bottom:7px; }
 .jh .co{ font-size:10.6px; } .jh .co .r{ font-size:9.4px; }
 .track{ margin:5px 0 1px; } .proj{ margin-top:3px; font-size:9.6px; }
-li{ margin-bottom:.5px; padding-left:11px; }
-li::before{ top:4.8px; width:3px; height:3px; }
+ul{ padding-left:11px; }
+li{ margin-bottom:.5px; }
 .edu{ margin-bottom:2px; }
 `;
 
@@ -362,19 +369,22 @@ h2{ font-size:12.3px; font-weight:700; color:var(--navy); text-transform:upperca
 p.summary{ margin-bottom:6px; }
 .skill{ margin-bottom:5px; } .skill b{ color:var(--navy); min-width:122px; font-size:10px; font-weight:700; }
 .chips{ line-height:1.55; } .chips em{ color:var(--ink); font-size:10.4px; }
-.job{ position:relative; padding:0 0 11px 24px; border-left:2px solid var(--navy); margin-left:7px; }
+/* The timeline is drawn with a border and a background dot, not a positioned
+   ::before — see the note in BASE_CSS: positioning reorders the PDF text. */
+.job{ padding:0 0 11px 24px; border-left:2px solid var(--navy); margin-left:7px;
+      background:radial-gradient(circle at 0 8px, var(--navy) 0 5px, #fff 5px 7px, transparent 7px);
+      background-repeat:no-repeat; }
 .job:last-of-type{ padding-bottom:0; border-left-color:transparent; }
-.job::before{ content:""; position:absolute; left:-6px; top:3px; width:10px; height:10px; border-radius:50%;
-              background:var(--navy); box-shadow:0 0 0 3px #fff; }
 .jh .co{ font-size:12px; font-weight:700; } .jh .co .r{ font-style:italic; font-weight:400; font-size:10px; }
 .jh .date{ color:var(--muted); font-size:9px; font-weight:600; }
 .place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1px 0 2px; }
 .track{ font-size:9.2px; font-weight:700; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin:7px 0 1px; }
 .proj{ font-size:10.2px; margin-top:4px; } .proj b{ color:var(--ink); }
 .proj span{ color:var(--soft); font-style:italic; }
-li{ padding-left:14px; margin-bottom:1px; }
-li::before{ content:""; position:absolute; left:1px; top:6px; width:5px; height:5px; background:var(--accent); border-radius:50%; }
-ul.strengths li::before{ background:var(--navy); }
+ul{ list-style:disc; padding-left:14px; }
+li{ margin-bottom:1px; }
+li::marker{ color:var(--accent); }
+ul.strengths li::marker{ color:var(--navy); }
 .edu{ margin-bottom:3px; } .edu b{ font-size:10.2px; }
 .edu i{ color:var(--muted); font-style:italic; font-size:9.4px; }
 .edu .date{ color:var(--muted); font-size:9.2px; font-weight:600; }
@@ -403,9 +413,8 @@ p.summary{ text-align:left; margin-bottom:5px; }
 .place{ font-size:10.5px; margin:1px 0 2px; }
 .track{ font-size:11px; font-weight:700; text-transform:uppercase; margin:6px 0 2px; }
 .proj{ font-size:11px; margin-top:4px; } .proj b{ font-weight:700; } .proj span{ font-style:normal; }
-/* a real bullet character, so it survives copy-paste out of the PDF */
-li{ padding-left:13px; margin-bottom:1.5px; }
-li::before{ content:"\\2022"; position:absolute; left:0; top:0; }
+ul{ list-style:disc; padding-left:14px; }
+li{ margin-bottom:1.5px; }
 .edu{ margin-bottom:3px; } .edu b{ font-size:11px; } .edu i{ font-style:normal; font-size:10.5px; }
 .edu .date{ font-size:11px; font-weight:700; }
 mark{ background:#e4e4e4; color:inherit; }
