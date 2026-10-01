@@ -16,6 +16,30 @@ function highlight(text: string, words: string[]): string {
   return out.replace(re, "<mark>$1</mark>");
 }
 
+/**
+ * Metrics are what a skimming recruiter's eye actually lands on, so they are
+ * set in bold automatically — the page can be read for proof without being
+ * read for prose.
+ *
+ * Only numbers carrying a magnitude marker (+, %, K, M, B, or a thousands
+ * comma) qualify. That deliberately excludes version numbers and years, so
+ * "React Native 0.85" and "Oct 2025" stay plain. The leading \b also keeps
+ * it out of tokens like "ES6+", where the digit is not at a word boundary.
+ *
+ * A years-of-experience count is excluded too. It is a seniority marker, not
+ * an achievement, and bolding "2+ years" would spend the reader's attention
+ * on the number the candidate is least helped by.
+ */
+const NOT_YEARS = String.raw`(?!\s*(?:years?|yrs?)\b)`;
+const METRIC = new RegExp(
+  String.raw`\b\d[\d,]*(?:\.\d+)?\s?[KMB]?[+%]${NOT_YEARS}` +
+    String.raw`|\b\d[\d,]*(?:\.\d+)?[KMB]\b${NOT_YEARS}`,
+  "gi"
+);
+
+const emphasiseMetrics = (html: string) =>
+  html.replace(METRIC, (m) => `<strong class="m">${m}</strong>`);
+
 export const A4_W = 794;
 export const A4_H = 1123;
 
@@ -36,6 +60,9 @@ export const isTemplate = (v: unknown): v is TemplateId =>
 /* text an ATS extracts never changes with the look.                   */
 /* ------------------------------------------------------------------ */
 function sections(d: Resume, hl: (t: string) => string) {
+  /* Prose carries the metrics; the skills list does not, and bolding inside a
+     comma-separated run of skills only makes it noisier. */
+  const hlb = (t: string) => emphasiseMetrics(hl(t));
   /* Separators are real text nodes, not CSS ::after content. Generated
      content is not part of the document text, so a parser reading the HTML
      would otherwise see "ReactNext.jsTypeScript" with nothing between. */
@@ -59,14 +86,14 @@ function sections(d: Resume, hl: (t: string) => string) {
                 (p) =>
                   `<div class="proj"><b>${esc(p.title)}</b>${
                     p.meta ? ` <span>— ${esc(p.meta)}</span>` : ""
-                  }</div><ul>${p.bullets.map((b) => `<li>${hl(b)}</li>`).join("")}</ul>`
+                  }</div><ul>${p.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>`
               )
               .join("");
             return `<div class="track">${esc(g.track)}</div>${projs}`;
           })
           .join("");
       }
-      if (j.bullets) inner += `<ul>${j.bullets.map((b) => `<li>${hl(b)}</li>`).join("")}</ul>`;
+      if (j.bullets) inner += `<ul>${j.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>`;
       return `<div class="job"><div class="jh"><div class="co">${esc(
         j.company
       )} <span class="r">— ${esc(j.role)}</span></div><div class="date">${esc(
@@ -88,7 +115,7 @@ function sections(d: Resume, hl: (t: string) => string) {
      leave a bare "Core Strengths" rule above nothing. */
   const strengths = (d.coreStrengths ?? []).length
     ? `<h2>Core Strengths</h2><ul class="strengths">${d.coreStrengths
-        .map((s) => `<li>${hl(s)}</li>`)
+        .map((s) => `<li>${hlb(s)}</li>`)
         .join("")}</ul>`
     : "";
 
@@ -105,7 +132,7 @@ function sections(d: Resume, hl: (t: string) => string) {
 
   const body = `
   <h2>Professional Summary</h2>
-  ${d.summary.map((p) => `<p class="summary">${hl(p)}</p>`).join("")}
+  ${d.summary.map((p) => `<p class="summary">${hlb(p)}</p>`).join("")}
   <h2>Technical Skills</h2>${skills}
   <h2>Professional Experience</h2>${jobs}
   ${strengths}
@@ -134,6 +161,8 @@ p.summary{ text-align:justify; }
 .chips em{ font-style:normal; }
 .jh{ display:flex; justify-content:space-between; align-items:baseline; break-after:avoid; }
 .jh .date{ white-space:nowrap; padding-left:12px; }
+/* auto-emphasised metrics — weight only, so it survives a mono print */
+strong.m{ font-weight:700; color:inherit; }
 .track, .proj, h2{ break-after:avoid; }
 ul{ list-style:none; margin:2px 0 0; }
 li{ position:relative; break-inside:avoid; }
