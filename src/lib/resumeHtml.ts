@@ -67,7 +67,13 @@ export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
     )
     .join("");
 
-  const strengths = d.coreStrengths.map((s) => `<li>${hl(s)}</li>`).join("");
+  /* Optional section: emptying coreStrengths must drop the heading too, not
+     leave a bare "Core Strengths" rule above nothing. */
+  const strengths = (d.coreStrengths ?? []).length
+    ? `<h2>Core Strengths</h2><ul class="strengths">${d.coreStrengths
+        .map((s) => `<li>${hl(s)}</li>`)
+        .join("")}</ul>`
+    : "";
   const c = d.contact;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
@@ -125,7 +131,7 @@ ul.strengths li::before{ background:var(--navy); }
   ${d.summary.map((p) => `<p class="summary">${hl(p)}</p>`).join("")}
   <h2>Technical Skills</h2>${skills}
   <h2>Professional Experience</h2><div class="timeline">${jobs}</div>
-  <h2>Core Strengths</h2><ul class="strengths">${strengths}</ul>
+  ${strengths}
   <h2>Education</h2>${edu}
 </div></body></html>`;
 }
