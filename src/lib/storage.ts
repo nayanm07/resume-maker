@@ -14,6 +14,7 @@ export const KEYS = {
   baseResume: "rt2_base_resume",
   jobPrefs: "rt2_job_prefs",
   template: "rt2_template",
+  emphasis: "rt2_emphasis",
 } as const;
 
 export function read<T>(key: string, fallback: T): T {

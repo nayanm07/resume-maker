@@ -40,6 +40,98 @@ const METRIC = new RegExp(
 const emphasiseMetrics = (html: string) =>
   html.replace(METRIC, (m) => `<strong class="m">${m}</strong>`);
 
+/* ------------------------------------------------------------------ */
+/* Key-term emphasis                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Engineering signals that show depth but rarely appear in a skills list.
+ * The rest of the dictionary is built from the resume's own skills, so this
+ * adapts to whoever is using the app rather than hard-coding one career.
+ */
+const SIGNAL_TERMS = [
+  "database-per-tenant", "multi-tenant", "offline-first", "end-to-end", "zero-downtime",
+  "conflict resolution", "background sync", "idempotent", "connection pool",
+  "ABDM", "ABHA", "HIP bridge", "scan-and-share", "Meta Cloud API",
+  "Azure Document Intelligence", "speech-to-text", "text-to-speech", "sentiment analysis",
+  "vector search", "semantic search", "proctoring", "slot locking", "webhooks",
+  "Broadcast Receivers", "native modules", "foreground service", "push notifications",
+  "STT", "TTS", "LLM", "OCR", "RAG", "RBAC", "JWT", "OTP", "OpenAPI", "CI/CD",
+  "microservices", "load balancing", "rate limiting", "caching", "sharding",
+];
+
+const reEsc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Terms worth emphasising: the resume's own skills, plus the signal list. */
+function buildTerms(d: Resume): string[] {
+  const out = new Set<string>();
+  const add = (s: string) => {
+    const t = s.trim();
+    // 3+ chars keeps "AI", "UI" and stray letters out; they are too common to carry weight
+    if (t.length > 2) out.add(t);
+  };
+  for (const group of d.skills) {
+    for (const raw of group.items) {
+      // "Kotlin (Native Modules)" -> "Kotlin" + "Native Modules"
+      add(raw.replace(/\s*\(.*$/, ""));
+      const inner = raw.match(/\(([^)]*)\)/)?.[1];
+      if (inner) inner.split(/[,/]/).forEach(add);
+    }
+  }
+  SIGNAL_TERMS.forEach(add);
+  // longest first, so "WhatsApp Cloud API" wins over "WhatsApp"
+  return [...out].sort((a, b) => b.length - a.length);
+}
+
+/** Run `fn` over the text between tags only, never over the tags themselves. */
+const mapText = (html: string, fn: (t: string) => string) =>
+  html
+    .split(/(<[^>]+>)/)
+    .map((part) => (part.startsWith("<") ? part : fn(part)))
+    .join("");
+
+/**
+ * Emphasis earns its keep only while it stays rare — a page where everything
+ * is bold reads exactly like a page where nothing is. Two budgets keep the
+ * density down: at most 2 terms per bullet, and any one term at most twice in
+ * the whole resume, so a word like "real-time" cannot carpet the page.
+ *
+ * Returns a stateful function; build a new one per render.
+ */
+function makeTermEmphasiser(terms: string[]) {
+  const PER_BULLET = 2;
+  const PER_DOC = 2;
+  const used = new Map<string, number>();
+
+  return (html: string): string => {
+    let placed = 0;
+    return mapText(html, (text) => {
+      let out = text;
+      for (const term of terms) {
+        if (placed >= PER_BULLET) break;
+        if ((used.get(term) ?? 0) >= PER_DOC) continue;
+        const re = new RegExp(`(?<![\\w-])(${reEsc(term)})(?![\\w-])`, "i");
+        if (!re.test(out)) continue;
+        out = out.replace(re, '<strong class="k">$1</strong>');
+        used.set(term, (used.get(term) ?? 0) + 1);
+        placed++;
+      }
+      return out;
+    });
+  };
+}
+
+export type EmphasisMode = "off" | "metrics" | "full";
+
+export const EMPHASIS: { id: EmphasisMode; label: string; note: string }[] = [
+  { id: "off", label: "Off", note: "Plain text — no automatic bolding anywhere." },
+  { id: "metrics", label: "Numbers", note: "Bolds every metric, so the eye lands on your proof first." },
+  { id: "full", label: "Numbers + work", note: "Also bolds the key technology in each bullet — capped at 2 per bullet so it stays scannable." },
+];
+
+export const isEmphasis = (v: unknown): v is EmphasisMode =>
+  EMPHASIS.some((e) => e.id === v);
+
 export const A4_W = 794;
 export const A4_H = 1123;
 
@@ -59,10 +151,15 @@ export const isTemplate = (v: unknown): v is TemplateId =>
 /* Shared markup — every template renders the same content, so the     */
 /* text an ATS extracts never changes with the look.                   */
 /* ------------------------------------------------------------------ */
-function sections(d: Resume, hl: (t: string) => string) {
-  /* Prose carries the metrics; the skills list does not, and bolding inside a
-     comma-separated run of skills only makes it noisier. */
-  const hlb = (t: string) => emphasiseMetrics(hl(t));
+function sections(d: Resume, hl: (t: string) => string, emphasis: EmphasisMode) {
+  /* Prose carries the emphasis; the skills list does not, since bolding inside
+     a comma-separated run of skills only makes it noisier. */
+  const terms = emphasis === "full" ? makeTermEmphasiser(buildTerms(d)) : null;
+  const hlb = (t: string) => {
+    if (emphasis === "off") return hl(t);
+    const withMetrics = emphasiseMetrics(hl(t));
+    return terms ? terms(withMetrics) : withMetrics;
+  };
   /* Separators are real text nodes, not CSS ::after content. Generated
      content is not part of the document text, so a parser reading the HTML
      would otherwise see "ReactNext.jsTypeScript" with nothing between. */
@@ -161,8 +258,8 @@ p.summary{ text-align:justify; }
 .chips em{ font-style:normal; }
 .jh{ display:flex; justify-content:space-between; align-items:baseline; break-after:avoid; }
 .jh .date{ white-space:nowrap; padding-left:12px; }
-/* auto-emphasised metrics — weight only, so it survives a mono print */
-strong.m{ font-weight:700; color:inherit; }
+/* auto-emphasis — weight only, so it survives a mono print */
+strong.m, strong.k{ font-weight:700; color:inherit; }
 .track, .proj, h2{ break-after:avoid; }
 ul{ list-style:none; margin:2px 0 0; }
 li{ position:relative; break-inside:avoid; }
@@ -316,10 +413,11 @@ const CSS: Record<TemplateId, string> = {
 export function renderResumeHtml(
   d: Resume,
   keywords: string[] = [],
-  template: TemplateId = "classic"
+  template: TemplateId = "classic",
+  emphasis: EmphasisMode = "metrics"
 ): string {
   const hl = (t: string) => highlight(t, keywords);
-  const { body, contactBits } = sections(d, hl);
+  const { body, contactBits } = sections(d, hl, emphasis);
   const contact = contactBits.join('<span class="sep">·</span>');
 
   const head = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE_CSS}${CSS[template]}</style></head><body>`;

@@ -19,7 +19,10 @@ import { KEYS, usePersisted } from "./lib/storage";
 import { Button, Card, Toasts, useToasts } from "./components/ui";
 import { Sidebar } from "./components/Sidebar";
 import { ResumePreview, type PreviewHandle } from "./components/ResumePreview";
-import { TEMPLATES, isTemplate, type TemplateId } from "./lib/resumeHtml";
+import {
+  EMPHASIS, TEMPLATES, isEmphasis, isTemplate,
+  type EmphasisMode, type TemplateId,
+} from "./lib/resumeHtml";
 import { ResumeEditor } from "./components/ResumeEditor";
 import { SkillGapTab } from "./components/tabs/SkillGapTab";
 import { AtsTab, CoverLetterTab, DiffTab, EmailTab, MessageTab } from "./components/tabs/SimpleTabs";
@@ -59,8 +62,10 @@ export default function App() {
   const [prompts, setPrompts] = usePersisted<Partial<PromptTemplates>>(KEYS.prompts, {});
   const [jobPrefs, setJobPrefs] = usePersisted<JobPrefs>(KEYS.jobPrefs, JOB_PREFS_DEFAULT, true);
   const [templateRaw, setTemplate] = usePersisted<TemplateId>(KEYS.template, "classic");
-  // guards against an old or hand-edited localStorage value naming a template that no longer exists
+  const [emphasisRaw, setEmphasis] = usePersisted<EmphasisMode>(KEYS.emphasis, "metrics");
+  // guards against an old or hand-edited localStorage value naming an option that no longer exists
   const template: TemplateId = isTemplate(templateRaw) ? templateRaw : "classic";
+  const emphasis: EmphasisMode = isEmphasis(emphasisRaw) ? emphasisRaw : "metrics";
   const [suggestingRoles, setSuggestingRoles] = useState(false);
 
   /** The user's master resume. Falls back to the bundled sample until they add their own. */
@@ -526,6 +531,23 @@ export default function App() {
                   </span>
                 </div>
 
+                <div className="tplbar">
+                  <span className="tpllbl">Auto-bold</span>
+                  {EMPHASIS.map((e) => (
+                    <button
+                      key={e.id}
+                      className={`tplbtn ${emphasis === e.id ? "on" : ""}`}
+                      title={e.note}
+                      onClick={() => setEmphasis(e.id)}
+                    >
+                      {e.label}
+                    </button>
+                  ))}
+                  <span className="tplnote">
+                    {EMPHASIS.find((e) => e.id === emphasis)?.note}
+                  </span>
+                </div>
+
                 <div className={`stage ${editing ? "editing" : ""}`}>
                   {editing && (
                     <ResumeEditor
@@ -540,6 +562,7 @@ export default function App() {
                     resume={resume}
                     keywords={keywords}
                     template={template}
+                    emphasis={emphasis}
                     onReady={(h) => { previewRef.current = h; }}
                   />
                 </div>
