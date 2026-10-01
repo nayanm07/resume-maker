@@ -286,3 +286,47 @@ textarea { resize: vertical; line-height: 1.5; }
 .querybox code { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
 
 a.btn { text-decoration: none; }
+
+/* ---------- resume template picker ---------- */
+.tplbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.tpllbl {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.tplbtn {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+.tplbtn:hover { border-color: var(--accent); }
+.tplbtn.on {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.tplnote {
+  flex: 1 1 220px;
+  min-width: 180px;
+  font-size: 11.5px;
+  color: var(--muted);
+}

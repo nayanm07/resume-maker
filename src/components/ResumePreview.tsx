@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Resume } from "../types";
-import { A4_W, A4_H, renderResumeHtml } from "../lib/resumeHtml";
+import { A4_W, A4_H, renderResumeHtml, type TemplateId } from "../lib/resumeHtml";
 
 export interface PreviewHandle {
   /** Opens the print dialog. `filename` becomes the suggested "Save as PDF" name. */
@@ -13,17 +13,21 @@ export interface PreviewHandle {
  * never collapse to scale(0).
  */
 export function ResumePreview({
-  resume, keywords = [], onReady,
+  resume, keywords = [], template = "classic", onReady,
 }: {
   resume: Resume;
   keywords?: string[];
+  template?: TemplateId;
   onReady?: (h: PreviewHandle) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(1);
 
-  const html = useMemo(() => renderResumeHtml(resume, keywords), [resume, keywords]);
+  const html = useMemo(
+    () => renderResumeHtml(resume, keywords, template),
+    [resume, keywords, template]
+  );
 
   const fit = () => {
     const w = wrapRef.current?.clientWidth ?? 0;

@@ -19,24 +19,32 @@ function highlight(text: string, words: string[]): string {
 export const A4_W = 794;
 export const A4_H = 1123;
 
-/**
- * Monochrome A4 resume.
- *
- * Black and white on purpose: colour blocks are the part of a designed resume
- * that ATS parsers most often mangle, and grey ink is what a recruiter's
- * photocopy or black-and-white print turns colour into anyway. Hierarchy here
- * comes from weight, size, case and rules — never from colour — so the page
- * survives being printed, scanned and forwarded.
- */
-export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
-  const hl = (t: string) => highlight(t, keywords);
+export type TemplateId = "classic" | "modern" | "compact" | "ats";
 
+export const TEMPLATES: { id: TemplateId; label: string; note: string }[] = [
+  { id: "classic", label: "Classic", note: "Monochrome, centred header. The safe default — prints and photocopies cleanly." },
+  { id: "modern", label: "Modern", note: "Navy header band. For design-led companies, startups and agencies." },
+  { id: "compact", label: "Compact", note: "Same content, tighter spacing. Use when the resume runs onto an extra page." },
+  { id: "ats", label: "Plain ATS", note: "No flourishes, Arial, plain rules. For job-portal uploads and strict parsers." },
+];
+
+export const isTemplate = (v: unknown): v is TemplateId =>
+  TEMPLATES.some((t) => t.id === v);
+
+/* ------------------------------------------------------------------ */
+/* Shared markup — every template renders the same content, so the     */
+/* text an ATS extracts never changes with the look.                   */
+/* ------------------------------------------------------------------ */
+function sections(d: Resume, hl: (t: string) => string) {
+  /* Separators are real text nodes, not CSS ::after content. Generated
+     content is not part of the document text, so a parser reading the HTML
+     would otherwise see "ReactNext.jsTypeScript" with nothing between. */
   const skills = d.skills
     .map(
       (s) =>
         `<div class="skill"><b>${esc(s.label)}</b><div class="chips">${s.items
           .map((i) => `<em>${hl(i)}</em>`)
-          .join("")}</div></div>`
+          .join(", ")}</div></div>`
     )
     .join("");
 
@@ -83,107 +91,221 @@ export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
         .map((s) => `<li>${hl(s)}</li>`)
         .join("")}</ul>`
     : "";
-  const c = d.contact;
 
-  /* One contact line. Dropping empty fields stops a stray " · · " appearing
-     for anyone whose resume has no portfolio or LinkedIn. */
-  const contact = [
+  const c = d.contact;
+  /* Dropping empty fields stops a stray separator for anyone whose resume
+     has no portfolio or LinkedIn. */
+  const contactBits = [
     esc(c.phone),
     esc(c.email),
     esc(c.location),
     c.linkedin ? `<a href="${c.linkedinUrl}">${esc(c.linkedin)}</a>` : "",
     c.portfolio ? `<a href="${c.portfolioUrl}">${esc(c.portfolio)}</a>` : "",
-  ]
-    .filter(Boolean)
-    .join('<span class="sep">·</span>');
+  ].filter(Boolean);
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-:root{ --ink:#000; --body:#1a1a1a; --mid:#3d3d3d; --soft:#5e5e5e; --rule:#c8c8c8; }
+  const body = `
+  <h2>Professional Summary</h2>
+  ${d.summary.map((p) => `<p class="summary">${hl(p)}</p>`).join("")}
+  <h2>Technical Skills</h2>${skills}
+  <h2>Professional Experience</h2>${jobs}
+  ${strengths}
+  <h2>Education</h2>${edu}`;
+
+  return { body, contactBits };
+}
+
+/* ------------------------------------------------------------------ */
+/* Structure shared by every template. Colour, size and the header are  */
+/* layered on top per template, so these rules stay in one place.       */
+/* ------------------------------------------------------------------ */
+const BASE_CSS = `
 *{ box-sizing:border-box; margin:0; padding:0; }
 /* margin:0 leaves the browser no room for its URL / date / page-number
    header & footer, so they are not printed. Spacing on continuation pages
    comes from .body padding repeated per page (box-decoration-break). */
 @page{ size:A4; margin:0; }
 html,body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--body);
-      font-size:10.6px; line-height:1.43; }
-.body{ padding:30px 40px 34px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
-
-/* ============ HEADER ============ */
-.hd{ text-align:center; padding-bottom:11px; border-bottom:2.2px solid var(--ink); margin-bottom:3px; }
-.hd .name{ font-size:28px; font-weight:400; letter-spacing:5.5px; color:var(--ink);
-           text-transform:uppercase; line-height:1.1; }
-.hd .role{ font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-           color:var(--ink); margin-top:7px; }
-.hd .sub{ font-size:9.4px; color:var(--mid); margin-top:4px; letter-spacing:.2px; }
-.hd .ct{ font-size:9.3px; color:var(--mid); margin-top:8px; }
-.hd .ct a{ color:var(--mid); text-decoration:none; }
-.hd .sep{ padding:0 6px; color:var(--soft); }
-/* thin second rule = a printed "double rule"; a classic, cheap signal of care */
-.hd2{ border-bottom:.6px solid var(--ink); margin-bottom:12px; }
-
-/* ============ SECTIONS ============ */
-h2{ font-size:10.6px; font-weight:700; color:var(--ink); text-transform:uppercase;
-    letter-spacing:2px; padding-bottom:2.5px; margin:13px 0 6px;
-    border-bottom:1px solid var(--ink); break-after:avoid; }
+.body{ -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 h2:first-child{ margin-top:0; }
-p.summary{ text-align:justify; margin-bottom:5px; }
+p.summary{ text-align:justify; }
+.skill{ display:flex; gap:10px; align-items:baseline; break-inside:avoid; }
+.skill b{ flex:none; }
+.chips{ display:block; }
+.chips em{ font-style:normal; }
+.jh{ display:flex; justify-content:space-between; align-items:baseline; break-after:avoid; }
+.jh .date{ white-space:nowrap; padding-left:12px; }
+.track, .proj, h2{ break-after:avoid; }
+ul{ list-style:none; margin:2px 0 0; }
+li{ position:relative; break-inside:avoid; }
+.edu{ display:flex; justify-content:space-between; align-items:baseline; break-inside:avoid; }
+.edu .date{ white-space:nowrap; padding-left:12px; }
+.hd a{ text-decoration:none; }
+`;
 
-/* ============ SKILLS ============ */
-.skill{ display:flex; gap:10px; margin-bottom:3.5px; align-items:baseline; break-inside:avoid; }
-.skill b{ color:var(--ink); min-width:112px; flex:none; font-size:9.9px; font-weight:700; }
-.chips{ display:block; line-height:1.5; }
-.chips em{ font-style:normal; color:var(--body); font-size:10.2px; }
-.chips em:not(:last-child)::after{ content:", "; color:var(--soft); }
-
-/* ============ EXPERIENCE ============ */
+/* ---------------- Classic — monochrome, centred ---------------- */
+const CLASSIC_CSS = `
+:root{ --ink:#000; --body:#1a1a1a; --mid:#3d3d3d; --soft:#5e5e5e; --rule:#c8c8c8; }
+body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--body); font-size:10.6px; line-height:1.43; }
+.body{ padding:30px 40px 34px; }
+.hd{ text-align:center; padding-bottom:11px; border-bottom:2.2px solid var(--ink); margin-bottom:3px; }
+.hd .name{ font-size:28px; font-weight:400; letter-spacing:5.5px; color:var(--ink); text-transform:uppercase; line-height:1.1; }
+.hd .role{ font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink); margin-top:7px; }
+.hd .sub{ font-size:9.4px; color:var(--mid); margin-top:4px; }
+.hd .ct{ font-size:9.3px; color:var(--mid); margin-top:8px; }
+.hd .ct a{ color:var(--mid); }
+.hd .sep{ padding:0 6px; color:var(--soft); }
+/* thin second rule = a printed "double rule"; a cheap, classic signal of care */
+.hd2{ border-bottom:.6px solid var(--ink); margin-bottom:12px; }
+h2{ font-size:10.6px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:2px;
+    padding-bottom:2.5px; margin:13px 0 6px; border-bottom:1px solid var(--ink); }
+p.summary{ margin-bottom:5px; }
+.skill{ margin-bottom:3.5px; } .skill b{ color:var(--ink); min-width:112px; font-size:9.9px; font-weight:700; }
+.chips{ line-height:1.5; } .chips em{ color:var(--body); font-size:10.2px; }
 /* No timeline rail: in one ink a vertical rule competes with the text for
    attention. Whitespace plus a bold company name separates entries better. */
-.job{ margin-bottom:10px; break-inside:auto; }
-.job:last-of-type{ margin-bottom:0; }
-.jh{ display:flex; justify-content:space-between; align-items:baseline; break-after:avoid; }
+.job{ margin-bottom:10px; } .job:last-of-type{ margin-bottom:0; }
 .jh .co{ font-size:11.4px; font-weight:700; color:var(--ink); }
 .jh .co .r{ font-style:italic; font-weight:400; font-size:10px; color:var(--body); }
-.jh .date{ color:var(--ink); font-size:9.2px; white-space:nowrap; padding-left:12px; font-weight:700; }
+.jh .date{ color:var(--ink); font-size:9.2px; font-weight:700; }
 .place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1.5px 0 2px; }
-.track{ font-size:8.9px; font-weight:700; letter-spacing:1.4px; color:var(--ink);
-        text-transform:uppercase; margin:7px 0 2px; padding-bottom:1.5px;
-        border-bottom:.6px solid var(--rule); break-after:avoid; }
-.proj{ font-size:10.1px; margin-top:4.5px; break-after:avoid; }
-.proj b{ color:var(--ink); font-weight:700; }
+.track{ font-size:8.9px; font-weight:700; letter-spacing:1.4px; color:var(--ink); text-transform:uppercase;
+        margin:7px 0 2px; padding-bottom:1.5px; border-bottom:.6px solid var(--rule); }
+.proj{ font-size:10.1px; margin-top:4.5px; } .proj b{ color:var(--ink); font-weight:700; }
 .proj span{ color:var(--soft); font-style:italic; font-size:9.5px; }
-
-/* ============ BULLETS ============ */
-ul{ list-style:none; margin:2px 0 0; }
-li{ position:relative; padding-left:12px; margin-bottom:1.5px; break-inside:avoid; }
+li{ padding-left:12px; margin-bottom:1.5px; }
 /* a small square prints crisper than a round dot at this size */
-li::before{ content:""; position:absolute; left:1px; top:5.2px; width:3.2px; height:3.2px;
-            background:var(--ink); }
-ul.strengths li::before{ width:3.2px; height:3.2px; background:#fff; border:1px solid var(--ink); }
-
-/* ============ EDUCATION ============ */
-.edu{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; break-inside:avoid; }
-.edu b{ font-size:10.1px; color:var(--ink); }
+li::before{ content:""; position:absolute; left:1px; top:5.2px; width:3.2px; height:3.2px; background:var(--ink); }
+ul.strengths li::before{ background:#fff; border:1px solid var(--ink); }
+.edu{ margin-bottom:3px; } .edu b{ font-size:10.1px; color:var(--ink); }
 .edu i{ color:var(--mid); font-style:italic; font-size:9.3px; }
-.edu .date{ color:var(--ink); font-size:9.2px; font-weight:700; white-space:nowrap; padding-left:12px; }
-
-/* on-screen keyword highlighting — grey, so it still reads if printed */
+.edu .date{ color:var(--ink); font-size:9.2px; font-weight:700; }
 mark{ background:#e4e4e4; color:inherit; padding:0 1px; border-bottom:.8px solid #8f8f8f; }
-</style></head><body>
-<div class="body">
-  <div class="hd">
+`;
+
+/* ---------------- Compact — classic, tightened ---------------- */
+const COMPACT_CSS = `${CLASSIC_CSS}
+body{ font-size:9.9px; line-height:1.34; }
+.body{ padding:22px 32px 24px; }
+.hd{ text-align:left; padding-bottom:8px; }
+.hd .name{ font-size:23px; letter-spacing:3.5px; }
+.hd .role{ font-size:10px; margin-top:4px; }
+.hd .sub{ font-size:8.8px; margin-top:2px; }
+.hd .ct{ font-size:8.8px; margin-top:5px; }
+.hd2{ margin-bottom:8px; }
+h2{ font-size:9.9px; letter-spacing:1.6px; margin:9px 0 4px; }
+p.summary{ margin-bottom:3px; }
+.skill{ margin-bottom:2px; } .skill b{ min-width:100px; font-size:9.3px; }
+.chips{ line-height:1.4; } .chips em{ font-size:9.6px; }
+.job{ margin-bottom:7px; }
+.jh .co{ font-size:10.6px; } .jh .co .r{ font-size:9.4px; }
+.track{ margin:5px 0 1px; } .proj{ margin-top:3px; font-size:9.6px; }
+li{ margin-bottom:.5px; padding-left:11px; }
+li::before{ top:4.8px; width:3px; height:3px; }
+.edu{ margin-bottom:2px; }
+`;
+
+/* ---------------- Modern — navy header band ---------------- */
+const MODERN_CSS = `
+:root{ --navy:#012E58; --accent:#2F80ED; --ink:#1f2630; --muted:#5c6672; --soft:#8a93a0; --rule:#e3e8ee; }
+body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--ink); font-size:10.8px; line-height:1.44; }
+.band{ background:var(--navy); color:#fff; padding:24px 34px; }
+.band .name{ font-size:32px; font-weight:300; letter-spacing:3px; line-height:1; }
+.band .role{ font-size:13px; font-weight:700; margin-top:7px; }
+.band .sub{ font-size:9.8px; font-weight:400; color:#bcd2e8; margin-top:3px; }
+.band .ct{ font-size:9.2px; color:#eaf1f8; margin-top:9px; }
+.band .ct a{ color:#cfe0f2; }
+.band .sep{ padding:0 6px; color:#7fa5cc; }
+.body{ padding:18px 34px 26px; }
+h2{ font-size:12.3px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1.5px;
+    padding-bottom:4px; margin:12px 0 6px; border-bottom:2px solid var(--navy); }
+p.summary{ margin-bottom:6px; }
+.skill{ margin-bottom:5px; } .skill b{ color:var(--navy); min-width:122px; font-size:10px; font-weight:700; }
+.chips{ line-height:1.55; } .chips em{ color:var(--ink); font-size:10.4px; }
+.job{ position:relative; padding:0 0 11px 24px; border-left:2px solid var(--navy); margin-left:7px; }
+.job:last-of-type{ padding-bottom:0; border-left-color:transparent; }
+.job::before{ content:""; position:absolute; left:-6px; top:3px; width:10px; height:10px; border-radius:50%;
+              background:var(--navy); box-shadow:0 0 0 3px #fff; }
+.jh .co{ font-size:12px; font-weight:700; } .jh .co .r{ font-style:italic; font-weight:400; font-size:10px; }
+.jh .date{ color:var(--muted); font-size:9px; font-weight:600; }
+.place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1px 0 2px; }
+.track{ font-size:9.2px; font-weight:700; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin:7px 0 1px; }
+.proj{ font-size:10.2px; margin-top:4px; } .proj b{ color:var(--ink); }
+.proj span{ color:var(--soft); font-style:italic; }
+li{ padding-left:14px; margin-bottom:1px; }
+li::before{ content:""; position:absolute; left:1px; top:6px; width:5px; height:5px; background:var(--accent); border-radius:50%; }
+ul.strengths li::before{ background:var(--navy); }
+.edu{ margin-bottom:3px; } .edu b{ font-size:10.2px; }
+.edu i{ color:var(--muted); font-style:italic; font-size:9.4px; }
+.edu .date{ color:var(--muted); font-size:9.2px; font-weight:600; }
+mark{ background:#fff3bf; color:inherit; padding:0 1px; border-radius:2px; }
+`;
+
+/* ---------------- Plain ATS — nothing decorative ---------------- */
+const ATS_CSS = `
+body{ font-family:Arial,Helvetica,sans-serif; color:#000; font-size:11px; line-height:1.4; }
+.body{ padding:34px 40px; }
+.hd{ margin-bottom:10px; }
+.hd .name{ font-size:22px; font-weight:700; }
+.hd .role{ font-size:12px; font-weight:700; margin-top:3px; }
+.hd .sub{ font-size:10.5px; margin-top:2px; }
+.hd .ct{ font-size:10.5px; margin-top:5px; }
+.hd .ct a{ color:#000; }
+.hd .sep{ padding:0 5px; }
+h2{ font-size:11.5px; font-weight:700; text-transform:uppercase; margin:12px 0 5px;
+    padding-bottom:2px; border-bottom:1px solid #000; }
+p.summary{ text-align:left; margin-bottom:5px; }
+.skill{ margin-bottom:3px; } .skill b{ min-width:120px; font-size:11px; font-weight:700; }
+.chips em{ font-size:11px; }
+.job{ margin-bottom:9px; }
+.jh .co{ font-size:11.5px; font-weight:700; } .jh .co .r{ font-weight:400; font-size:11px; font-style:normal; }
+.jh .date{ font-size:11px; font-weight:700; }
+.place{ font-size:10.5px; margin:1px 0 2px; }
+.track{ font-size:11px; font-weight:700; text-transform:uppercase; margin:6px 0 2px; }
+.proj{ font-size:11px; margin-top:4px; } .proj b{ font-weight:700; } .proj span{ font-style:normal; }
+/* a real bullet character, so it survives copy-paste out of the PDF */
+li{ padding-left:13px; margin-bottom:1.5px; }
+li::before{ content:"\\2022"; position:absolute; left:0; top:0; }
+.edu{ margin-bottom:3px; } .edu b{ font-size:11px; } .edu i{ font-style:normal; font-size:10.5px; }
+.edu .date{ font-size:11px; font-weight:700; }
+mark{ background:#e4e4e4; color:inherit; }
+`;
+
+const CSS: Record<TemplateId, string> = {
+  classic: CLASSIC_CSS,
+  compact: COMPACT_CSS,
+  modern: MODERN_CSS,
+  ats: ATS_CSS,
+};
+
+/**
+ * Render the resume as a standalone A4 HTML page.
+ *
+ * All four templates emit the same markup and the same words — only the
+ * stylesheet and the header block change — so switching look can never
+ * change what an ATS reads out of the file.
+ */
+export function renderResumeHtml(
+  d: Resume,
+  keywords: string[] = [],
+  template: TemplateId = "classic"
+): string {
+  const hl = (t: string) => highlight(t, keywords);
+  const { body, contactBits } = sections(d, hl);
+  const contact = contactBits.join('<span class="sep">·</span>');
+
+  const head = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE_CSS}${CSS[template]}</style></head><body>`;
+
+  const headline = `
     <div class="name">${esc(d.name)}</div>
     <div class="role">${esc(d.title)}</div>
     <div class="sub">${esc(d.subtitle)}</div>
-    <div class="ct">${contact}</div>
-  </div>
-  <div class="hd2"></div>
+    <div class="ct">${contact}</div>`;
 
-  <h2>Professional Summary</h2>
-  ${d.summary.map((p) => `<p class="summary">${hl(p)}</p>`).join("")}
-  <h2>Technical Skills</h2>${skills}
-  <h2>Professional Experience</h2>${jobs}
-  ${strengths}
-  <h2>Education</h2>${edu}
-</div></body></html>`;
+  /* Modern's band is full-bleed, so it sits outside the padded .body */
+  if (template === "modern") {
+    return `${head}<div class="band">${headline}</div><div class="body">${body}</div></body></html>`;
+  }
+
+  const rule = template === "ats" ? "" : `<div class="hd2"></div>`;
+  return `${head}<div class="body"><div class="hd">${headline}</div>${rule}${body}</div></body></html>`;
 }

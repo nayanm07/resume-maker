@@ -19,6 +19,7 @@ import { KEYS, usePersisted } from "./lib/storage";
 import { Button, Card, Toasts, useToasts } from "./components/ui";
 import { Sidebar } from "./components/Sidebar";
 import { ResumePreview, type PreviewHandle } from "./components/ResumePreview";
+import { TEMPLATES, isTemplate, type TemplateId } from "./lib/resumeHtml";
 import { ResumeEditor } from "./components/ResumeEditor";
 import { SkillGapTab } from "./components/tabs/SkillGapTab";
 import { AtsTab, CoverLetterTab, DiffTab, EmailTab, MessageTab } from "./components/tabs/SimpleTabs";
@@ -57,6 +58,9 @@ export default function App() {
   const [locks, setLocks] = usePersisted<SectionLocks>(KEYS.locks, ALL_UNLOCKED, true);
   const [prompts, setPrompts] = usePersisted<Partial<PromptTemplates>>(KEYS.prompts, {});
   const [jobPrefs, setJobPrefs] = usePersisted<JobPrefs>(KEYS.jobPrefs, JOB_PREFS_DEFAULT, true);
+  const [templateRaw, setTemplate] = usePersisted<TemplateId>(KEYS.template, "classic");
+  // guards against an old or hand-edited localStorage value naming a template that no longer exists
+  const template: TemplateId = isTemplate(templateRaw) ? templateRaw : "classic";
   const [suggestingRoles, setSuggestingRoles] = useState(false);
 
   /** The user's master resume. Falls back to the bundled sample until they add their own. */
@@ -505,6 +509,23 @@ export default function App() {
                   </span>
                 </div>
 
+                <div className="tplbar">
+                  <span className="tpllbl">Template</span>
+                  {TEMPLATES.map((t) => (
+                    <button
+                      key={t.id}
+                      className={`tplbtn ${template === t.id ? "on" : ""}`}
+                      title={t.note}
+                      onClick={() => setTemplate(t.id)}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                  <span className="tplnote">
+                    {TEMPLATES.find((t) => t.id === template)?.note}
+                  </span>
+                </div>
+
                 <div className={`stage ${editing ? "editing" : ""}`}>
                   {editing && (
                     <ResumeEditor
@@ -518,6 +539,7 @@ export default function App() {
                   <ResumePreview
                     resume={resume}
                     keywords={keywords}
+                    template={template}
                     onReady={(h) => { previewRef.current = h; }}
                   />
                 </div>
