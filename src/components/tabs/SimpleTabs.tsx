@@ -123,14 +123,15 @@ function letterHtml(body: string, r: Resume, date: string): string {
 @page{ size:A4; margin:20mm 22mm; }
 html,body{ background:#fff; }
 body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#1f2630; font-size:11pt; line-height:1.6; }
-.head{ border-bottom:2px solid #012E58; padding-bottom:10px; margin-bottom:22px; }
-.head .n{ font-size:20pt; font-weight:300; letter-spacing:2px; color:#012E58; }
-.head .c{ font-size:9pt; color:#5c6672; margin-top:6px; }
-.date{ color:#5c6672; font-size:10pt; margin-bottom:20px; }
+/* monochrome, to match the resume it is attached to */
+.head{ border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:22px; }
+.head .n{ font-size:20pt; font-weight:400; letter-spacing:4px; color:#000; text-transform:uppercase; }
+.head .c{ font-size:9pt; color:#3d3d3d; margin-top:6px; }
+.date{ color:#3d3d3d; font-size:10pt; margin-bottom:20px; }
 p{ margin:0 0 12px; text-align:justify; }
 .sign{ margin-top:22px; }
-.sign .nm{ font-weight:700; margin-top:26px; }
-.sign .ct{ color:#5c6672; font-size:9.5pt; }
+.sign .nm{ font-weight:700; margin-top:26px; color:#000; }
+.sign .ct{ color:#3d3d3d; font-size:9.5pt; }
 </style></head><body>
 <div class="head">
   <div class="n">${escHtml(name.toUpperCase())}</div>

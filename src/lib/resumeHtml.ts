@@ -19,6 +19,15 @@ function highlight(text: string, words: string[]): string {
 export const A4_W = 794;
 export const A4_H = 1123;
 
+/**
+ * Monochrome A4 resume.
+ *
+ * Black and white on purpose: colour blocks are the part of a designed resume
+ * that ATS parsers most often mangle, and grey ink is what a recruiter's
+ * photocopy or black-and-white print turns colour into anyway. Hierarchy here
+ * comes from weight, size, case and rules — never from colour — so the page
+ * survives being printed, scanned and forwarded.
+ */
 export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
   const hl = (t: string) => highlight(t, keywords);
 
@@ -76,61 +85,104 @@ export function renderResumeHtml(d: Resume, keywords: string[] = []): string {
     : "";
   const c = d.contact;
 
+  /* One contact line. Dropping empty fields stops a stray " · · " appearing
+     for anyone whose resume has no portfolio or LinkedIn. */
+  const contact = [
+    esc(c.phone),
+    esc(c.email),
+    esc(c.location),
+    c.linkedin ? `<a href="${c.linkedinUrl}">${esc(c.linkedin)}</a>` : "",
+    c.portfolio ? `<a href="${c.portfolioUrl}">${esc(c.portfolio)}</a>` : "",
+  ]
+    .filter(Boolean)
+    .join('<span class="sep">·</span>');
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-:root{ --navy:#012E58; --accent:#2F80ED; --ink:#1f2630; --muted:#5c6672; --soft:#8a93a0; --line:#e3e8ee; }
+:root{ --ink:#000; --body:#1a1a1a; --mid:#3d3d3d; --soft:#5e5e5e; --rule:#c8c8c8; }
 *{ box-sizing:border-box; margin:0; padding:0; }
 /* margin:0 leaves the browser no room for its URL / date / page-number
    header & footer, so they are not printed. Spacing on continuation pages
    comes from .body padding repeated per page (box-decoration-break). */
 @page{ size:A4; margin:0; }
 html,body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--ink); font-size:10.8px; line-height:1.44; }
-mark{ background:#fff3bf; color:inherit; padding:0 1px; border-radius:2px; }
-.band{ background:var(--navy); color:#fff; display:flex; justify-content:space-between; align-items:center; gap:26px; padding:26px 34px; }
-.band .name{ font-size:33px; font-weight:300; letter-spacing:3px; line-height:1; }
-.band .role{ font-size:13.5px; font-weight:700; margin-top:7px; }
-.band .role small{ display:block; font-weight:400; color:#bcd2e8; font-size:10px; margin-top:3px; letter-spacing:.4px; }
-.contact{ text-align:right; font-size:9.2px; } .contact div{ margin-bottom:5px; color:#eaf1f8; }
-.contact a{ color:#cfe0f2; text-decoration:none; }
-.body{ padding:22px 34px 30px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
-h2{ font-size:12.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:1.5px; padding-bottom:4px; margin:11px 0 6px; border-bottom:2px solid var(--navy); }
-h2:first-child{ margin-top:0; } p.summary{ text-align:justify; margin-bottom:6px; }
-.skill{ display:flex; gap:10px; margin-bottom:5px; align-items:baseline; }
-.skill b{ color:var(--navy); min-width:122px; flex:none; font-size:10px; }
-.chips{ display:block; line-height:1.55; } .chips em{ font-style:normal; color:var(--ink); font-size:10.4px; }
-.chips em:not(:last-child)::after{ content:", "; color:var(--muted); }
-.timeline{ position:relative; margin:4px 0 0 7px; }
-.job{ position:relative; padding:0 0 11px 26px; border-left:2px solid var(--navy); }
-.job:last-of-type{ padding-bottom:0; border-left-color:transparent; } .job:first-of-type{ padding-top:1px; }
-.job:first-of-type::after{ content:""; position:absolute; left:-2px; top:-6px; width:6px; height:9px; background:#fff; }
-.job::before{ content:""; position:absolute; left:-6px; top:2px; width:11px; height:11px; border-radius:50%; background:var(--navy); box-shadow:0 0 0 3px #fff; }
+body{ font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--body);
+      font-size:10.6px; line-height:1.43; }
+.body{ padding:30px 40px 34px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+
+/* ============ HEADER ============ */
+.hd{ text-align:center; padding-bottom:11px; border-bottom:2.2px solid var(--ink); margin-bottom:3px; }
+.hd .name{ font-size:28px; font-weight:400; letter-spacing:5.5px; color:var(--ink);
+           text-transform:uppercase; line-height:1.1; }
+.hd .role{ font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+           color:var(--ink); margin-top:7px; }
+.hd .sub{ font-size:9.4px; color:var(--mid); margin-top:4px; letter-spacing:.2px; }
+.hd .ct{ font-size:9.3px; color:var(--mid); margin-top:8px; }
+.hd .ct a{ color:var(--mid); text-decoration:none; }
+.hd .sep{ padding:0 6px; color:var(--soft); }
+/* thin second rule = a printed "double rule"; a classic, cheap signal of care */
+.hd2{ border-bottom:.6px solid var(--ink); margin-bottom:12px; }
+
+/* ============ SECTIONS ============ */
+h2{ font-size:10.6px; font-weight:700; color:var(--ink); text-transform:uppercase;
+    letter-spacing:2px; padding-bottom:2.5px; margin:13px 0 6px;
+    border-bottom:1px solid var(--ink); break-after:avoid; }
+h2:first-child{ margin-top:0; }
+p.summary{ text-align:justify; margin-bottom:5px; }
+
+/* ============ SKILLS ============ */
+.skill{ display:flex; gap:10px; margin-bottom:3.5px; align-items:baseline; break-inside:avoid; }
+.skill b{ color:var(--ink); min-width:112px; flex:none; font-size:9.9px; font-weight:700; }
+.chips{ display:block; line-height:1.5; }
+.chips em{ font-style:normal; color:var(--body); font-size:10.2px; }
+.chips em:not(:last-child)::after{ content:", "; color:var(--soft); }
+
+/* ============ EXPERIENCE ============ */
+/* No timeline rail: in one ink a vertical rule competes with the text for
+   attention. Whitespace plus a bold company name separates entries better. */
+.job{ margin-bottom:10px; break-inside:auto; }
+.job:last-of-type{ margin-bottom:0; }
 .jh{ display:flex; justify-content:space-between; align-items:baseline; break-after:avoid; }
-.jh .co{ font-size:12px; font-weight:700; } .jh .co .r{ font-style:italic; font-weight:400; font-size:10px; }
-.jh .date{ color:var(--muted); font-size:9px; white-space:nowrap; padding-left:10px; font-weight:600; }
-.place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1px 0 2px; }
-.track{ font-size:9.2px; font-weight:700; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin:6px 0 1px; }
-.proj{ font-size:10.2px; margin-top:4px; break-after:avoid; } .proj b{ color:var(--ink); } .proj span{ color:var(--soft); font-style:italic; }
-ul{ list-style:none; margin:2px 0 0; } li{ position:relative; padding-left:14px; margin-bottom:1px; break-inside:avoid; }
-li::before{ content:""; position:absolute; left:1px; top:6px; width:5px; height:5px; background:var(--accent); border-radius:50%; }
-ul.strengths li::before{ background:var(--navy); }
-.edu{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
-.edu b{ font-size:10.2px; } .edu i{ color:var(--muted); font-style:italic; font-size:9.4px; }
-.edu .date{ color:var(--muted); font-size:9.2px; font-weight:600; white-space:nowrap; padding-left:10px; }
+.jh .co{ font-size:11.4px; font-weight:700; color:var(--ink); }
+.jh .co .r{ font-style:italic; font-weight:400; font-size:10px; color:var(--body); }
+.jh .date{ color:var(--ink); font-size:9.2px; white-space:nowrap; padding-left:12px; font-weight:700; }
+.place{ color:var(--soft); font-style:italic; font-size:8.8px; margin:1.5px 0 2px; }
+.track{ font-size:8.9px; font-weight:700; letter-spacing:1.4px; color:var(--ink);
+        text-transform:uppercase; margin:7px 0 2px; padding-bottom:1.5px;
+        border-bottom:.6px solid var(--rule); break-after:avoid; }
+.proj{ font-size:10.1px; margin-top:4.5px; break-after:avoid; }
+.proj b{ color:var(--ink); font-weight:700; }
+.proj span{ color:var(--soft); font-style:italic; font-size:9.5px; }
+
+/* ============ BULLETS ============ */
+ul{ list-style:none; margin:2px 0 0; }
+li{ position:relative; padding-left:12px; margin-bottom:1.5px; break-inside:avoid; }
+/* a small square prints crisper than a round dot at this size */
+li::before{ content:""; position:absolute; left:1px; top:5.2px; width:3.2px; height:3.2px;
+            background:var(--ink); }
+ul.strengths li::before{ width:3.2px; height:3.2px; background:#fff; border:1px solid var(--ink); }
+
+/* ============ EDUCATION ============ */
+.edu{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; break-inside:avoid; }
+.edu b{ font-size:10.1px; color:var(--ink); }
+.edu i{ color:var(--mid); font-style:italic; font-size:9.3px; }
+.edu .date{ color:var(--ink); font-size:9.2px; font-weight:700; white-space:nowrap; padding-left:12px; }
+
+/* on-screen keyword highlighting — grey, so it still reads if printed */
+mark{ background:#e4e4e4; color:inherit; padding:0 1px; border-bottom:.8px solid #8f8f8f; }
 </style></head><body>
-<div class="band">
-  <div><div class="name">${esc(d.name)}</div>
-  <div class="role">${esc(d.title)}<small>${esc(d.subtitle)}</small></div></div>
-  <div class="contact">
-    <div>${esc(c.phone)}</div><div>${esc(c.email)}</div><div>${esc(c.location)}</div>
-    <div><a href="${c.linkedinUrl}">${esc(c.linkedin)}</a></div>
-    <div><a href="${c.portfolioUrl}">${esc(c.portfolio)}</a></div>
-  </div>
-</div>
 <div class="body">
+  <div class="hd">
+    <div class="name">${esc(d.name)}</div>
+    <div class="role">${esc(d.title)}</div>
+    <div class="sub">${esc(d.subtitle)}</div>
+    <div class="ct">${contact}</div>
+  </div>
+  <div class="hd2"></div>
+
   <h2>Professional Summary</h2>
   ${d.summary.map((p) => `<p class="summary">${hl(p)}</p>`).join("")}
   <h2>Technical Skills</h2>${skills}
-  <h2>Professional Experience</h2><div class="timeline">${jobs}</div>
+  <h2>Professional Experience</h2>${jobs}
   ${strengths}
   <h2>Education</h2>${edu}
 </div></body></html>`;
