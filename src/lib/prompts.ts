@@ -102,6 +102,16 @@ GROUND RULES
   • body: "Dear Hiring Manager," unless the JD names a person; an opening that names the role; a middle that covers each relevantProject (what was built, key tech, its metric) and ties each to a specific JD requirement; a close with availability (notice period from My Details) and a call to action; sign off with the candidate's name, phone and portfolio URL from the base resume.
   • Match the requested TONE. Plain text, no markdown. Never leave bracket placeholders like [Company] or [Name]. Never mention current or expected salary / CTC.`,
 
+  letterRule: `- COVER LETTER — a formal letter to attach as a PDF or paste into an application form. It is NOT the cover email reworded: the email is a short note that carries an attachment, this is the full argument for hiring the candidate.
+  • Plain text, 300-380 words, no markdown, no bullet symbols. Separate paragraphs with a blank line.
+  • Do NOT write a subject line, a letterhead, a date, an address block or a sign-off — the app adds all of those around your text. Start at the greeting and end at the last sentence of the final paragraph.
+  • Greeting: "Dear Hiring Manager," unless the JD names a person or a team.
+  • Paragraph 1 — the exact role being applied for (from TARGET or the JD) and one sentence of fit built on total experience plus the single strongest relevant fact.
+  • Paragraphs 2-3 — two or three base-resume projects. For each: what was built, the key technologies, and one metric copied verbatim from the base resume, tied explicitly to a named requirement in the JD. Prefer depth on fewer projects over listing many.
+  • Paragraph 4 — why THIS role and company, drawn only from what the JD actually says, then availability using the notice period from My Details.
+  • Final line — one sentence inviting an interview.
+  • Match the requested TONE. Never invent facts, never use bracket placeholders like [Company] or [Name], never mention current or expected salary / CTC.`,
+
   outreachRule: `- OUTREACH (WhatsApp / LinkedIn DM / LinkedIn comment):
   • Match the requested TONE. Plain text, no markdown or hashtags. Never use bracket placeholders like [Name] or [Company] — if a name is unknown, write naturally without one. Never mention salary / CTC.
   • whatsappMessage: a greeting, the role, ONE strongest relevant metric from the resume, and a clear ask to connect or share the resume.
@@ -142,6 +152,7 @@ export const PROMPT_META: { key: PromptKey; label: string; help: string }[] = [
   { key: "skillWeaveRule", label: "② Generate — approved skills", help: "How ticked skills are added, including weaving them into the project you picked." },
   { key: "atsRule", label: "② Generate — ATS score", help: "The scoring rubric, so the same resume gets a consistent score." },
   { key: "emailRule", label: "② Generate — cover email", help: "Subject format, structure, project citations. Blocks salary mentions and [placeholders]." },
+  { key: "letterRule", label: "② Generate — cover letter", help: "The formal letter you attach as a PDF. Longer and more argued than the email; the app adds the letterhead, date and sign-off around it." },
   { key: "outreachRule", label: "② Generate — WhatsApp / DM / comment", help: "Quality rules for the three short outreach messages." },
   { key: "qaSectionRule", label: "② Generate — Q&A questions", help: "Which questions to predict when 'Application Q&A' is ticked." },
   { key: "jobQuerySystem", label: "🔎 Find Jobs — AI role suggestions", help: "Suggests job-board search titles and skills from your resume (used by ✨ Suggest with AI in Find Jobs)." },
@@ -244,6 +255,11 @@ export function generatePrompt(opts: {
     schema.push(' "coverEmail": { "subject":"...", "body":"<250-320 words>" }');
   }
 
+  if (want.letter) {
+    rules.push(P(prompts, "letterRule"));
+    schema.push(' "coverLetter": "<300-380 words, plain text, paragraphs separated by blank lines, no sign-off>"');
+  }
+
   if (want.whatsapp || want.dm || want.comment) rules.push(P(prompts, "outreachRule"));
   if (want.whatsapp) schema.push(' "whatsappMessage": "<60-90 words, max 2 emojis>"');
   if (want.dm) schema.push(' "linkedinDM": "<120-160 words>"');
@@ -261,7 +277,7 @@ export function generatePrompt(opts: {
     schema.join(",\n") +
     "\n}\nOutput ONLY valid JSON.";
 
-  const needsDetails = want.qa || want.email || want.whatsapp || want.dm;
+  const needsDetails = want.qa || want.email || want.letter || want.whatsapp || want.dm;
   const details = needsDetails
     ? `\n=== MY DETAILS ===
 Total experience: ${profile.exp} | Notice period: ${profile.notice} | Current CTC: ${profile.current} | Expected CTC: ${profile.expected} | Open to: ${profile.roles}\n`

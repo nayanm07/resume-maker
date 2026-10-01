@@ -25,6 +25,7 @@ the request to the AI provider you choose.
 - **📄 Tailored resume** — reordered/reworded for the JD, ticked skills added
 - **✅ ATS report** — match score, matched vs. missing keywords, suggestions
 - **✉️ Cover email** — names the 2-4 most relevant projects with their real metrics
+- **📝 Cover letter** — a formal A4 letter to attach as a PDF. Your letterhead, today's date and the sign-off are added automatically; **⬇ PDF** saves it as `<Name> - Cover Letter - <role>.pdf`
 - **💬 WhatsApp**, **📩 LinkedIn DM**, **💡 LinkedIn comment**
 - **🤖 Application Q&A** — predicts screening questions and answers them in first person
 

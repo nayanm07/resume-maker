@@ -9,6 +9,7 @@ const OUTPUT_COST: Record<OutputKey, number> = {
   resume: 1400,
   ats: 260,
   email: 620,
+  letter: 760,
   whatsapp: 110,
   dm: 190,
   comment: 80,

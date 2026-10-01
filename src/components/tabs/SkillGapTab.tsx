@@ -9,6 +9,7 @@ const WANT_LABELS: { key: OutputKey; label: string }[] = [
   { key: "resume", label: "📄 Resume" },
   { key: "ats", label: "✅ ATS Report" },
   { key: "email", label: "✉️ Cover Email" },
+  { key: "letter", label: "📝 Cover Letter" },
   { key: "whatsapp", label: "💬 WhatsApp" },
   { key: "dm", label: "📩 LinkedIn DM" },
   { key: "comment", label: "💡 LinkedIn Comment" },

@@ -21,7 +21,7 @@ import { Sidebar } from "./components/Sidebar";
 import { ResumePreview, type PreviewHandle } from "./components/ResumePreview";
 import { ResumeEditor } from "./components/ResumeEditor";
 import { SkillGapTab } from "./components/tabs/SkillGapTab";
-import { AtsTab, DiffTab, EmailTab, MessageTab } from "./components/tabs/SimpleTabs";
+import { AtsTab, CoverLetterTab, DiffTab, EmailTab, MessageTab } from "./components/tabs/SimpleTabs";
 import { QaTab } from "./components/tabs/QaTab";
 import { VersionsTab } from "./components/tabs/VersionsTab";
 import { TrackerTab } from "./components/tabs/TrackerTab";
@@ -34,11 +34,12 @@ import {
 } from "./lib/resumeImport";
 
 type TabId =
-  | "mine" | "jobs" | "gap" | "resume" | "diff" | "ats" | "email"
+  | "mine" | "jobs" | "gap" | "resume" | "diff" | "ats" | "email" | "letter"
   | "whatsapp" | "dm" | "comment" | "qa" | "versions" | "tracker" | "prompts";
 
 const WANT_DEFAULT: WantMap = {
-  resume: true, ats: true, email: false, whatsapp: false, dm: false, comment: false, qa: false,
+  resume: true, ats: true, email: false, letter: false,
+  whatsapp: false, dm: false, comment: false, qa: false,
 };
 
 export default function App() {
@@ -87,6 +88,7 @@ export default function App() {
   const [ats, setAts] = useState<AtsReport | null>(null);
   const [email, setEmail] = useState<CoverEmail | null>(null);
   const [projects, setProjects] = useState<RelevantProject[]>([]);
+  const [letter, setLetter] = useState("");
   const [wa, setWa] = useState("");
   const [dm, setDm] = useState("");
   const [comment, setComment] = useState("");
@@ -182,13 +184,15 @@ export default function App() {
         });
         setProjects(data.relevantProjects ?? []);
       }
+      if (want.letter) setLetter(fixNameCase(data.coverLetter, base.name));
       if (want.whatsapp) setWa(fixNameCase(data.whatsappMessage, base.name));
       if (want.dm) setDm(fixNameCase(data.linkedinDM, base.name));
       if (want.comment) setComment(fixNameCase(data.linkedinComment, base.name));
       if (want.qa && Array.isArray(data.applicationQA)) setQa(data.applicationQA);
 
       const first: TabId = want.resume ? "resume" : want.ats ? "ats" : want.email ? "email"
-        : want.whatsapp ? "whatsapp" : want.dm ? "dm" : want.comment ? "comment" : "qa";
+        : want.letter ? "letter" : want.whatsapp ? "whatsapp" : want.dm ? "dm"
+        : want.comment ? "comment" : "qa";
       setTab(first);
       const score = want.ats && data.atsReport ? ` Score ${data.atsReport.matchScore}/100.` : "";
       toast.ok(`Done!${score} Only the selected outputs were generated.`);
@@ -382,6 +386,7 @@ export default function App() {
     { id: "diff", label: "🔀 Changes", badge: diff.length || undefined },
     { id: "ats", label: "✅ ATS" },
     { id: "email", label: "✉️ Email" },
+    { id: "letter", label: "📝 Cover Letter" },
     { id: "whatsapp", label: "💬 WhatsApp" },
     { id: "dm", label: "📩 DM" },
     { id: "comment", label: "💡 Comment" },
@@ -524,6 +529,9 @@ export default function App() {
             {tab === "email" && (
               <EmailTab email={email} projects={projects} recruiterEmails={jdEmails}
                 onQuickApply={quickApply} />
+            )}
+            {tab === "letter" && (
+              <CoverLetterTab letter={letter} resume={resume} target={target} />
             )}
             {tab === "whatsapp" && (
               <MessageTab title="WhatsApp Message" text={wa} waLink

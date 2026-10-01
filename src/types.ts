@@ -51,6 +51,9 @@ export interface AtsReport {
 }
 export interface RelevantProject { name: string; match: string; highlight: string; }
 export interface CoverEmail { subject: string; body: string; }
+/** Formal cover letter body — greeting + paragraphs only. The app adds the
+ *  letterhead, date and sign-off when it renders or prints it. */
+export type CoverLetter = string;
 export interface QaItem { q: string; a: string; user?: boolean; }
 
 export interface GenerateResult {
@@ -58,6 +61,7 @@ export interface GenerateResult {
   atsReport?: AtsReport;
   relevantProjects?: RelevantProject[];
   coverEmail?: CoverEmail;
+  coverLetter?: CoverLetter;
   whatsappMessage?: string;
   linkedinDM?: string;
   linkedinComment?: string;
@@ -73,7 +77,7 @@ export interface Profile {
   exp: string; notice: string; current: string; expected: string; roles: string;
 }
 
-export type OutputKey = "resume" | "ats" | "email" | "whatsapp" | "dm" | "comment" | "qa";
+export type OutputKey = "resume" | "ats" | "email" | "letter" | "whatsapp" | "dm" | "comment" | "qa";
 export type WantMap = Record<OutputKey, boolean>;
 
 /** Which resume sections the AI is allowed to rewrite. Locked ones are
@@ -91,6 +95,7 @@ export type PromptKey =
   | "skillWeaveRule"
   | "atsRule"
   | "emailRule"
+  | "letterRule"
   | "outreachRule"
   | "qaSectionRule"
   | "qaRules"
