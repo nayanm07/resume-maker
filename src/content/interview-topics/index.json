@@ -1,0 +1,140 @@
+[
+  {
+    "file": "README.md",
+    "stage": "Start here",
+    "title": "Interview Topics — in study order",
+    "checks": 0
+  },
+  {
+    "file": "01-javascript-typescript.md",
+    "stage": "Stage 1 — The language",
+    "title": "JavaScript & TypeScript Core",
+    "checks": 19
+  },
+  {
+    "file": "02-html-css-react-nextjs.md",
+    "stage": "Stage 1 — The language",
+    "title": "HTML, CSS, React & Next.js",
+    "checks": 23
+  },
+  {
+    "file": "03-react-native-mobile.md",
+    "stage": "Stage 1 — The language",
+    "title": "React Native, Native Android, iOS & App Store Deployment",
+    "checks": 21
+  },
+  {
+    "file": "04-nodejs-nestjs.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Node.js & NestJS",
+    "checks": 17
+  },
+  {
+    "file": "05-databases.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Databases (PostgreSQL, MySQL, MongoDB)",
+    "checks": 19
+  },
+  {
+    "file": "06-redis.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Redis (Complete Topic Notes)",
+    "checks": 12
+  },
+  {
+    "file": "07-bullmq.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "BullMQ & Job Queues (Complete Topic Notes)",
+    "checks": 13
+  },
+  {
+    "file": "08-cron-and-schedulers.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Cron Jobs & Schedulers (Complete Topic Notes)",
+    "checks": 11
+  },
+  {
+    "file": "09-realtime-websockets.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Real-Time Systems (WebSocket / Socket.IO)",
+    "checks": 13
+  },
+  {
+    "file": "10-multi-tenant-saas.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Multi-Tenant SaaS Architecture",
+    "checks": 13
+  },
+  {
+    "file": "11-auth-and-security.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "Authentication, Authorization & Security",
+    "checks": 13
+  },
+  {
+    "file": "12-api-design.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "API Design (REST + GraphQL basics)",
+    "checks": 12
+  },
+  {
+    "file": "13-ai-llm-voice.md",
+    "stage": "Stage 2 — The backend core",
+    "title": "AI, LLM & Voice Engineering",
+    "checks": 36
+  },
+  {
+    "file": "14-cloud-devops.md",
+    "stage": "Stage 3 — The senior rounds",
+    "title": "Cloud, DevOps & Deployment",
+    "checks": 28
+  },
+  {
+    "file": "15-system-design.md",
+    "stage": "Stage 3 — The senior rounds",
+    "title": "System Design",
+    "checks": 23
+  },
+  {
+    "file": "16-testing-quality.md",
+    "stage": "Stage 3 — The senior rounds",
+    "title": "Testing & Code Quality",
+    "checks": 23
+  },
+  {
+    "file": "17-python-fastapi.md",
+    "stage": "Optional — Python track",
+    "title": "Python & FastAPI",
+    "checks": 24
+  },
+  {
+    "file": "18-coding-round/README.md",
+    "stage": "Stage 4 — Coding round practice",
+    "title": "Coding Round Question Bank",
+    "checks": 0
+  },
+  {
+    "file": "18-coding-round/01-js-logic.md",
+    "stage": "Stage 4 — Coding round practice",
+    "title": "JavaScript Logic Questions (with and without built-in functions)",
+    "checks": 13
+  },
+  {
+    "file": "18-coding-round/02-dsa.md",
+    "stage": "Stage 4 — Coding round practice",
+    "title": "DSA Question Bank (JavaScript) — 2-year developer level",
+    "checks": 8
+  },
+  {
+    "file": "18-coding-round/03-sql.md",
+    "stage": "Stage 4 — Coding round practice",
+    "title": "SQL Query Question Bank (PostgreSQL)",
+    "checks": 7
+  },
+  {
+    "file": "18-coding-round/04-basic-tasks.md",
+    "stage": "Stage 4 — Coding round practice",
+    "title": "Basic Coding Tasks (create an API, call an API, and more)",
+    "checks": 7
+  }
+]

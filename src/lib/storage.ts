@@ -17,6 +17,8 @@ export const KEYS = {
   emphasis: "rt2_emphasis",
   scale: "rt2_scale",
   depth: "rt2_depth",
+  prepTopic: "rt2_prep_topic",
+  prepChecks: "rt2_prep_checks",
 } as const;
 
 export function read<T>(key: string, fallback: T): T {

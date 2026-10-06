@@ -63,6 +63,14 @@ its own skill and project order, and — below **Full** depth — its own select
   the preview and checked against Chrome's print output.
 - **Auto** picks the role from the target role / JD.
 
+### 🎓 Interview Prep
+A reader for the interview notes: 23 topics in study order, grouped by stage.
+- Topics load one at a time, so the notes never slow down the resume tools
+- Links between notes open in place; "Jump to a section" covers each topic's headings
+- The self-check tick boxes are live and saved in your browser, with progress per topic
+- The notes are written in `../interview-topics`. After editing them run **`npm run sync:topics`**,
+  which copies them into `src/content/interview-topics` (the copy Vercel builds from), then deploy
+
 ### Advanced (new in v2)
 - **🔀 Changes tab** — a real diff showing every bullet the AI **reworded** and every skill it **added**, so you can sanity-check it in seconds
 - **🖍 Keyword highlighting** — highlights JD keywords inside the resume preview

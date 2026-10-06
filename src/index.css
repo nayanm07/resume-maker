@@ -357,3 +357,70 @@ a.btn { text-decoration: none; }
 .pgmeter.ok { background: var(--ok-soft); color: var(--ok); }
 .pgmeter.near { background: var(--warn-soft); color: var(--warn); }
 .pgmeter.over { background: var(--bad-soft); color: var(--bad); }
+
+/* ---------- interview prep ---------- */
+.prep { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 18px; align-items: start; }
+.prepnav {
+  position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto;
+  padding-right: 4px; display: flex; flex-direction: column; gap: 2px;
+}
+.prepstage {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--muted); margin: 12px 0 4px;
+}
+.prepitem {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  font: inherit; font-size: 12.5px; line-height: 1.35; padding: 6px 9px; margin-bottom: 2px;
+  border-radius: 8px; border: 1px solid transparent; background: none; color: var(--ink); cursor: pointer;
+}
+.prepitem .grow { flex: 1 1 auto; min-width: 0; }
+.prepitem:hover { background: var(--panel-2); border-color: var(--line); }
+.prepitem.on { background: var(--navy); color: #fff; }
+.prepcount { flex: none; font-size: 10.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.prepcount.full { color: var(--ok); }
+.prepitem.on .prepcount { color: #dbe7f5; }
+.prepsum { font-size: 12px; color: var(--muted); margin-top: 6px; white-space: nowrap; }
+.prepsum b { color: var(--ink); }
+.prepbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.prepbar select { max-width: 420px; flex: 1 1 240px; }
+.prepbar .prepsum { margin-top: 0; }
+
+.prepdoc { font-size: 14.5px; line-height: 1.68; color: var(--ink); overflow-wrap: anywhere; scroll-margin-top: 12px; }
+.prepdoc h1 { font-size: 24px; line-height: 1.25; margin: 0 0 14px; padding-bottom: 9px; border-bottom: 2px solid var(--navy); }
+.prepdoc h2 { font-size: 18px; margin: 30px 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
+.prepdoc h3 { font-size: 15.5px; margin: 22px 0 7px; color: var(--accent); }
+.prepdoc h4 { font-size: 14.5px; margin: 16px 0 5px; }
+.prepdoc h1, .prepdoc h2, .prepdoc h3, .prepdoc h4 { scroll-margin-top: 14px; }
+.prepdoc p { margin: 9px 0; }
+.prepdoc ul, .prepdoc ol { margin: 8px 0 12px; padding-left: 24px; }
+.prepdoc li { margin: 4px 0; }
+.prepdoc li:has(> input[type="checkbox"]) { list-style: none; margin-left: -22px; }
+.prepdoc input[type="checkbox"] { width: 15px; height: 15px; margin: 0 8px 0 0; vertical-align: -2px; cursor: pointer; accent-color: var(--accent); }
+.prepdoc a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.prepdoc hr { border: none; border-top: 1px solid var(--line); margin: 22px 0; }
+.prepdoc blockquote {
+  margin: 12px 0; padding: 9px 14px; border-left: 3px solid var(--accent);
+  background: var(--accent-soft); border-radius: 0 8px 8px 0;
+}
+.prepdoc blockquote p { margin: 4px 0; }
+.prepdoc code {
+  font-family: Consolas, "Cascadia Code", "Courier New", monospace; font-size: 0.9em;
+  background: var(--panel-2); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px;
+}
+.prepdoc pre {
+  background: #0f1b2a; color: #e6eefc; padding: 13px 15px; border-radius: 10px;
+  overflow-x: auto; margin: 12px 0; font-size: 13px; line-height: 1.55;
+}
+.prepdoc pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; overflow-wrap: normal; }
+/* the page must never scroll sideways because one table is wide — the table scrolls instead */
+.prepdoc .tablewrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: 10px; }
+.prepdoc table { border-collapse: collapse; width: 100%; font-size: 13.5px; overflow-wrap: normal; }
+.prepdoc th, .prepdoc td { padding: 8px 11px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.prepdoc th { background: var(--panel-2); font-weight: 700; white-space: nowrap; }
+.prepdoc tr:last-child td { border-bottom: none; }
+
+@media (max-width: 900px) {
+  /* minmax(0, …), not 1fr: a bare 1fr track is as wide as its widest code block */
+  .prep { grid-template-columns: minmax(0, 1fr); }
+  .prepnav { position: static; max-height: 260px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+}

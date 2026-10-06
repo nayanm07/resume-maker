@@ -34,6 +34,7 @@ import { TrackerTab } from "./components/tabs/TrackerTab";
 import { PromptsTab } from "./components/tabs/PromptsTab";
 import { MyResumeTab } from "./components/tabs/MyResumeTab";
 import { JobSearchTab } from "./components/tabs/JobSearchTab";
+import { InterviewPrepTab } from "./components/tabs/InterviewPrepTab";
 import { JOB_PREFS_DEFAULT, type JobPrefs } from "./lib/jobSearch";
 import {
   coerceResume, extractText, parseUserPrompt,
@@ -41,7 +42,7 @@ import {
 
 type TabId =
   | "mine" | "jobs" | "gap" | "resume" | "diff" | "ats" | "email" | "letter"
-  | "whatsapp" | "dm" | "comment" | "qa" | "versions" | "tracker" | "prompts";
+  | "whatsapp" | "dm" | "comment" | "qa" | "versions" | "tracker" | "prep" | "prompts";
 
 const WANT_DEFAULT: WantMap = {
   resume: true, ats: true, email: false, letter: false,
@@ -433,6 +434,7 @@ export default function App() {
     { id: "qa", label: "🤖 Q&A", badge: qa.length || undefined },
     { id: "versions", label: "📚 Versions", badge: versions.length || undefined },
     { id: "tracker", label: "📊 Tracker", badge: apps.length || undefined },
+    { id: "prep", label: "🎓 Interview Prep" },
     { id: "prompts", label: "🧩 Prompts", badge: Object.keys(prompts).length || undefined },
   ];
 
@@ -709,6 +711,7 @@ export default function App() {
             {tab === "tracker" && (
               <TrackerTab apps={apps} setApps={setApps} versions={versions} onLoadVersion={loadVersion} />
             )}
+            {tab === "prep" && <InterviewPrepTab />}
             {tab === "prompts" && <PromptsTab prompts={prompts} setPrompts={setPrompts} />}
           </Card>
         </main>
