@@ -37,6 +37,9 @@ const METRIC = new RegExp(
   "gi"
 );
 
+/** Non-global twin of METRIC for .test() — a global regex keeps state between calls. */
+const HAS_FIGURE = /\b\d[\d,]*(?:\.\d+)?\s?[KMB]?[+%]/i;
+
 const emphasiseMetrics = (html: string) =>
   html.replace(METRIC, (m) => `<strong class="m">${m}</strong>`);
 
@@ -193,19 +196,32 @@ function sections(d: Resume, hl: (t: string) => string, emphasis: EmphasisMode) 
       if (j.groups) {
         inner += j.groups
           .map((g) => {
-            const projs = g.projects
-              .map(
-                (p) =>
-                  `<div class="proj"><b>${esc(p.title)}</b>${
-                    p.meta ? ` <span>— ${esc(p.meta)}</span>` : ""
-                  }</div><ul>${p.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>`
-              )
-              .join("");
-            return `<div class="track">${esc(g.track)}</div>${projs}`;
+            const one = (p: (typeof g.projects)[number]) =>
+              `<div class="proj"><b>${esc(p.title)}</b>${
+                p.meta ? ` <span>— ${esc(p.meta)}</span>` : ""
+              }</div>${
+                p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>` : ""
+              }`;
+            /* A role version folds its least relevant projects down to no
+               bullets. Several of those in a row would be a column of bare
+               titles, so they share one line — keeping any reach figure from
+               the meta ("100K+ downloads"), which is worth a glance for any role. */
+            const shown = g.projects.filter((p) => p.bullets.length);
+            const folded = g.projects.filter((p) => !p.bullets.length);
+            const also =
+              folded.length < 2
+                ? folded.map(one).join("")
+                : `<div class="proj">Also: ${folded
+                    .map((p) => {
+                      const reach = (p.meta ?? "").split("·").map((x) => x.trim()).filter((x) => HAS_FIGURE.test(x));
+                      return `<b>${esc(p.title)}</b>${reach.length ? ` (${hlb(reach.join(", "))})` : ""}`;
+                    })
+                    .join(" · ")}</div>`;
+            return `<div class="track">${esc(g.track)}</div>${shown.map(one).join("")}${also}`;
           })
           .join("");
       }
-      if (j.bullets) inner += `<ul>${j.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>`;
+      if (j.bullets?.length) inner += `<ul>${j.bullets.map((b) => `<li>${hlb(b)}</li>`).join("")}</ul>`;
       return `<div class="job"><div class="jh"><div class="co">${esc(
         j.company
       )} <span class="r">— ${esc(j.role)}</span></div><div class="date">${esc(

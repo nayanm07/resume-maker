@@ -4,7 +4,9 @@ import type {
   Profile, PromptTemplates, ProviderId, ProviderStore, QaItem, RelevantProject, Resume,
   RoleFocus, SavedVersion, SectionLocks, TrackedApp, WantMap,
 } from "./types";
-import { detectFocus, positionResume } from "./lib/positioning";
+import {
+  DEPTHS, FOCUS_IDS, FOCUS_LABEL, detectFocus, isDepth, isFocus, positionResume, type Depth,
+} from "./lib/positioning";
 import { BASE, PROFILE_DEFAULT } from "./data/baseResume";
 import { PROVIDERS } from "./lib/providers";
 import { callLLM, parseJSON } from "./lib/llm";
@@ -69,6 +71,8 @@ export default function App() {
   const [scaleRaw, setScale] = usePersisted<number>(KEYS.scale, 1);
   const scale = clampScale(scaleRaw);
   const nudgeScale = (d: number) => setScale(clampScale(scale + d));
+  /** length of the previewed resume in A4 pages, reported by the preview after each render */
+  const [pages, setPages] = useState<number | null>(null);
   const [suggestingRoles, setSuggestingRoles] = useState(false);
 
   /** The user's master resume. Falls back to the bundled sample until they add their own. */
@@ -83,12 +87,15 @@ export default function App() {
   const setTone = (v: string) => setDraft({ ...draft, tone: v });
 
   /* ---------------- role positioning (no AI, instant) ---------------- */
-  const focusPref = draft.focus ?? "auto";
+  // an older build could have saved a role id that no longer exists ("ai")
+  const focusPref: RoleFocus | "auto" = isFocus(draft.focus) ? draft.focus : "auto";
+  const [depthRaw, setDepth] = usePersisted<Depth>(KEYS.depth, "focused");
+  const depth: Depth = isDepth(depthRaw) ? depthRaw : "focused";
   const setFocusPref = (f: RoleFocus | "auto") => setDraft({ ...draft, focus: f });
   const detectedFocus = useMemo(() => detectFocus(draft.target, draft.jd), [draft.target, draft.jd]);
   const focus: RoleFocus = focusPref === "auto" ? detectedFocus : focusPref;
   /** base resume with the role's headline/summary and relevance ordering applied */
-  const positioned = useMemo(() => positionResume(base, focus), [base, focus]);
+  const positioned = useMemo(() => positionResume(base, focus, depth), [base, focus, depth]);
   /** true once the resume was generated, edited or loaded — then it stops following `positioned` */
   const [tailored, setTailored] = useState(false);
 
@@ -367,6 +374,27 @@ export default function App() {
   };
   const useBuiltInResume = () => { setStoredBase(null); setTailored(false); setGap(null); setPicked({}); };
 
+  /** Role buttons in the Resume tab. A tailored or hand-edited resume no longer
+   *  follows the role, so say so instead of silently appearing to do nothing. */
+  const pickRole = (f: RoleFocus | "auto") => {
+    setFocusPref(f);
+    if (tailored)
+      toast.info("You're viewing a tailored / edited resume — press ↺ Base to rebuild it for this role.");
+  };
+
+  /** "One page" only fits in the Compact template — measured: every other
+   *  template runs 15–20% over at the same content — so choosing it brings
+   *  Compact along rather than leaving a button that does not do what it says. */
+  const pickDepth = (d: Depth) => {
+    setDepth(d);
+    if (d === "tight" && template !== "compact") {
+      setTemplate("compact");
+      toast.info("Switched to the Compact template — that is what lets it fit one page.");
+    }
+    if (tailored)
+      toast.info("You're viewing a tailored / edited resume — press ↺ Base to rebuild it at this depth.");
+  };
+
   /* ---------------- editor helpers ---------------- */
   const revertSection = (s: "summary" | "skills" | "experience" | "strengths") => {
     const next = clone(resume);
@@ -518,6 +546,43 @@ export default function App() {
                 </div>
 
                 <div className="tplbar">
+                  <span className="tpllbl">Role</span>
+                  <button
+                    className={`tplbtn ${focusPref === "auto" ? "on" : ""}`}
+                    title="Pick the role from the job description / target role"
+                    onClick={() => pickRole("auto")}
+                  >
+                    Auto{focusPref === "auto" ? ` · ${FOCUS_LABEL[detectedFocus]}` : ""}
+                  </button>
+                  {FOCUS_IDS.map((f) => (
+                    <button
+                      key={f}
+                      className={`tplbtn ${focusPref === f ? "on" : ""}`}
+                      onClick={() => pickRole(f)}
+                    >
+                      {FOCUS_LABEL[f]}
+                    </button>
+                  ))}
+                </div>
+
+                {focus !== "balanced" && (
+                  <div className="tplbar">
+                    <span className="tpllbl">Depth</span>
+                    {DEPTHS.map((d) => (
+                      <button
+                        key={d.id}
+                        className={`tplbtn ${depth === d.id ? "on" : ""}`}
+                        title={d.note}
+                        onClick={() => pickDepth(d.id)}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                    <span className="tplnote">{DEPTHS.find((d) => d.id === depth)?.note}</span>
+                  </div>
+                )}
+
+                <div className="tplbar">
                   <span className="tpllbl">Template</span>
                   {TEMPLATES.map((t) => (
                     <button
@@ -571,9 +636,18 @@ export default function App() {
                   {scale !== 1 && (
                     <button className="tplbtn" onClick={() => setScale(1)}>↺ Reset</button>
                   )}
+                  {pages !== null && (
+                    <span
+                      className={`pgmeter ${pages <= 1 ? "ok" : pages <= 1.15 ? "near" : "over"}`}
+                      title="Length of this resume in A4 pages, measured from the preview"
+                    >
+                      {pages <= 1
+                        ? `✓ Fits 1 page · ${Math.round(pages * 100)}% full`
+                        : `${pages.toFixed(2)} pages · ${Math.round((pages - 1) * 100)}% over one`}
+                    </span>
+                  )}
                   <span className="tplnote">
-                    Resizes the whole resume and re-wraps the text, so the printed page
-                    count really changes — not just the preview.
+                    Re-wraps the text, so the printed page count really changes.
                   </span>
                 </div>
 
@@ -593,6 +667,7 @@ export default function App() {
                     template={template}
                     emphasis={emphasis}
                     scale={scale}
+                    onPages={setPages}
                     onReady={(h) => { previewRef.current = h; }}
                   />
                 </div>

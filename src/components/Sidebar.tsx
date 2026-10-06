@@ -91,8 +91,9 @@ export function Sidebar(props: {
           </select>
         </Field>
         <div className="hint">
-          Swaps the headline &amp; summary and puts the most relevant skills and projects first, so a
-          full-stack role doesn't read as mobile-only. Preview updates instantly — no AI tokens.
+          Rebuilds the resume for that role — headline, summary, strengths, skill order and which
+          bullets lead — so a full-stack role doesn't read as mobile-only. <b>Universal</b> shows
+          everything as written. Preview updates instantly — no AI tokens.
         </div>
         <Field label="Tone for outreach messages">
           <select value={tone} onChange={(e) => setTone(e.target.value)}>

@@ -28,9 +28,10 @@ export const JOB_PREFS_DEFAULT: JobPrefs = {
 /** Titles recruiters actually post on Indian job boards, per role type. */
 const ROLE_LIBRARY: Record<Focus, string[]> = {
   fullstack: ["Full Stack Developer", "MERN Stack Developer"],
+  fsmobile: ["React Native Developer", "Full Stack Mobile Developer"],
+  fsai: ["AI Engineer", "Generative AI Developer"],
+  mobile: ["Mobile App Developer", "Android Developer"],
   backend: ["Node.js Developer", "Backend Developer"],
-  mobile: ["React Native Developer", "Mobile App Developer"],
-  ai: ["AI Engineer", "Generative AI Developer"],
 };
 
 /** "Backend Engineer (Node.js/NestJS)" -> "Backend Engineer" */

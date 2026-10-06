@@ -344,3 +344,16 @@ a.btn { text-decoration: none; }
   cursor: not-allowed;
   border-color: var(--line);
 }
+
+/* live page-length readout beside the text-size control */
+.pgmeter {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pgmeter.ok { background: var(--ok-soft); color: var(--ok); }
+.pgmeter.near { background: var(--warn-soft); color: var(--warn); }
+.pgmeter.over { background: var(--bad-soft); color: var(--bad); }

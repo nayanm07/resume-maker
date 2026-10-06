@@ -15,7 +15,7 @@ export interface PreviewHandle {
  * never collapse to scale(0).
  */
 export function ResumePreview({
-  resume, keywords = [], template = "classic", emphasis = "metrics", scale: textScale = 1, onReady,
+  resume, keywords = [], template = "classic", emphasis = "metrics", scale: textScale = 1, onReady, onPages,
 }: {
   resume: Resume;
   keywords?: string[];
@@ -24,10 +24,28 @@ export function ResumePreview({
   /** resume text size, 0.8–1.2; separate from the preview's fit-to-column scale */
   scale?: number;
   onReady?: (h: PreviewHandle) => void;
+  /** reports the laid-out length in A4 pages (1.24 = a page and a quarter) after every render */
+  onPages?: (pages: number) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(1);
+  // latest callback without re-subscribing the iframe's load handler
+  const onPagesRef = useRef(onPages);
+  onPagesRef.current = onPages;
+
+  /* Measured to the bottom of the last piece of content, not the document or
+     the body. The document is never shorter than the iframe viewport, which
+     would report every short resume as exactly one page; and the body ends in
+     padding, which print drops at a page end — counting it called a resume
+     that prints on one page "1.01 pages". */
+  const measure = () => {
+    const doc = frameRef.current?.contentDocument;
+    const last = doc?.querySelector(".body")?.lastElementChild;
+    if (!doc?.body || !last) return;
+    const h = last.getBoundingClientRect().bottom - doc.body.getBoundingClientRect().top;
+    if (h > 0) onPagesRef.current?.(h / A4_H);
+  };
 
   const html = useMemo(
     () => renderResumeHtml(resume, keywords, template, emphasis, textScale),
@@ -80,6 +98,7 @@ export function ResumePreview({
         ref={frameRef}
         title="Resume preview"
         srcDoc={html}
+        onLoad={measure}
         style={{ transform: `scale(${scale})` }}
       />
     </div>

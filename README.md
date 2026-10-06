@@ -42,6 +42,27 @@ Your experience is **never deleted**. Three layers enforce it:
 - **🧩 Prompts tab** — every AI prompt is visible and editable, with reset-to-default.
 - **⬇ PDF** is saved under the job role name, with no browser header/footer.
 
+### Role versions
+Your base resume is the **universal** one. The **Role** switch rebuilds it for the job:
+
+| Role | Leads with |
+|---|---|
+| **Universal** | Everything, exactly as written |
+| **Full Stack** | Web product delivery — React / Next.js + Node.js / NestJS |
+| **Full Stack Mobile** | The app *and* the server behind it |
+| **Full Stack AI** | LLM / RAG / voice products, with the APIs and UIs that ship them |
+| **Mobile App Developer** | Apps, native modules, store releases |
+| **Backend** | APIs, data, queues, multi-tenancy |
+
+Each role has its own headline, summary and strengths (hand-written in `baseResume.ts → positioning`),
+its own skill and project order, and — below **Full** depth — its own selection of bullets:
+
+- **Depth: One page / Focused / Full** — One page and Focused spend a fixed bullet budget on what the
+  role values and fold the rest into an "Also" line. Nothing is deleted from your base resume.
+- **Page meter** — shows the real length ("✓ Fits 1 page · 97% full" / "1.34 pages"), measured from
+  the preview and checked against Chrome's print output.
+- **Auto** picks the role from the target role / JD.
+
 ### Advanced (new in v2)
 - **🔀 Changes tab** — a real diff showing every bullet the AI **reworded** and every skill it **added**, so you can sanity-check it in seconds
 - **🖍 Keyword highlighting** — highlights JD keywords inside the resume preview
