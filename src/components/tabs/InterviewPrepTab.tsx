@@ -18,7 +18,10 @@ export function InterviewPrepTab() {
   const [query, setQuery] = useState("");
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [error, setError] = useState("");
+  /** focus mode: the tab covers the whole window, hiding the rest of the app */
+  const [focus, setFocus] = useState(false);
   const docRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
   /** where to land once the next topic has rendered: a heading, or the top */
   const landing = useRef<string | null>(null);
   const firstRender = useRef(true);
@@ -40,6 +43,20 @@ export function InterviewPrepTab() {
       .catch((e: unknown) => alive && setError(e instanceof Error ? e.message : String(e)));
     return () => { alive = false; };
   }, [file]);
+
+  /* While focused the page behind must not scroll, and Esc leaves — the same
+     way out a full-screen video gives. Both are undone on exit or unmount. */
+  useEffect(() => {
+    if (!focus) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setFocus(false); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [focus]);
 
   const jump = (hash: string) =>
     docRef.current
@@ -121,7 +138,7 @@ export function InterviewPrepTab() {
   if (!TOPICS.length) return <div className="empty">No interview notes are bundled with this build.</div>;
 
   return (
-    <div className="prep">
+    <div className={`prep ${focus ? "focus" : ""}`}>
       <nav className="prepnav" aria-label="Interview topics">
         <input
           value={query} onChange={(e) => setQuery(e.target.value)}
@@ -155,7 +172,7 @@ export function InterviewPrepTab() {
         {!groups.length && <div className="muted" style={{ padding: "8px 2px" }}>No topic matches “{query}”.</div>}
       </nav>
 
-      <div className="prepmain">
+      <div className="prepmain" ref={mainRef}>
         <div className="prepbar">
           <select
             value="" aria-label="Jump to a section"
@@ -165,12 +182,23 @@ export function InterviewPrepTab() {
             <option value="">Jump to a section…</option>
             {ready && loaded?.sections.map((s) => <option key={s.id} value={s.id}>{s.text}</option>)}
           </select>
-          {!!topic?.checks && (
-            <span className="prepsum">
-              <b>{done}</b> / {topic.checks} ticked
-              {done > 0 && <button className="btn sm ghost" onClick={resetTicks} style={{ marginLeft: 8 }}>Clear</button>}
-            </span>
-          )}
+          <span className="prepsum">
+            {!!topic?.checks && (
+              <>
+                <b>{done}</b> / {topic.checks} ticked
+                {done > 0 && <button className="btn sm ghost" onClick={resetTicks} style={{ marginLeft: 8 }}>Clear</button>}
+              </>
+            )}
+            <button
+              className={`btn sm ${focus ? "accent" : "ghost"}`}
+              style={{ marginLeft: 10 }}
+              onClick={() => setFocus((f) => !f)}
+              title={focus ? "Back to the app (Esc)" : "Fill the window with the notes"}
+              aria-pressed={focus}
+            >
+              {focus ? "✕ Exit focus" : "⛶ Focus mode"}
+            </button>
+          </span>
         </div>
 
         {error && <div className="empty">Couldn't load this topic: {error}</div>}

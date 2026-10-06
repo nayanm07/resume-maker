@@ -419,7 +419,35 @@ a.btn { text-decoration: none; }
 .prepdoc th { background: var(--panel-2); font-weight: 700; white-space: nowrap; }
 .prepdoc tr:last-child td { border-bottom: none; }
 
+/* quiet scrollbars: the default one is a bright white bar on the dark theme */
+.prepnav, .prepmain, .prepdoc pre, .prepdoc .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+
+/* ---- focus mode: the tab covers the window; the list and the notes each scroll on their own ---- */
+.prep.focus {
+  position: fixed; inset: 0; z-index: 60; background: var(--panel);
+  padding: 14px 22px 0; grid-template-columns: 280px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr);
+}
+.prep.focus .prepnav { position: static; max-height: none; height: 100%; padding-bottom: 14px; }
+.prep.focus .prepmain { height: 100%; overflow-y: auto; padding: 0 10px 40px 0; }
+/* the bar stays in reach while reading, so Exit and Jump are never a scroll away */
+.prep.focus .prepbar {
+  position: sticky; top: 0; z-index: 1; background: var(--panel);
+  margin: 0 0 12px; padding: 0 0 10px; border-bottom: 1px solid var(--line);
+}
+/* a full-width line of text is hard to read; tables and code still use the room */
+.prep.focus .prepdoc { max-width: 1100px; margin: 0 auto; }
+/* jumps must land below the sticky bar, not underneath it */
+.prep.focus .prepdoc, .prep.focus .prepdoc h1, .prep.focus .prepdoc h2,
+.prep.focus .prepdoc h3, .prep.focus .prepdoc h4 { scroll-margin-top: 66px; }
+
 @media (max-width: 900px) {
+  /* one column: the whole overlay scrolls, with the topic list on top */
+  /* no top padding on the scroller: a sticky bar pins below it, and text would
+     scroll past in the gap above the bar. The list carries the spacing instead. */
+  .prep.focus { display: block; overflow-y: auto; padding: 0 14px; }
+  .prep.focus .prepnav { height: auto; max-height: 220px; margin: 12px 0; }
+  .prep.focus .prepbar { padding-top: 8px; }
+  .prep.focus .prepmain { height: auto; overflow: visible; padding-right: 0; }
   /* minmax(0, …), not 1fr: a bare 1fr track is as wide as its widest code block */
   .prep { grid-template-columns: minmax(0, 1fr); }
   .prepnav { position: static; max-height: 260px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
