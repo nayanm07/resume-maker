@@ -232,6 +232,21 @@ export const BASE: Resume = {
         "Production AI platforms — a database-per-tenant voice-interview SaaS and a public voice-AI API consumed by 10+ client integrations.",
       ],
     },
+    /* The stack here is the real one: these systems run on Node.js / NestJS.
+       Do not restate them as Python or FastAPI — an AI interview tests Python
+       directly, and a claim the code cannot back fails at the first follow-up. */
+    ai: {
+      title: "AI Developer (LLM, RAG & Voice AI)",
+      subtitle: "LLMs | RAG & Embeddings | Vector DB | STT / TTS | OCR | Node.js / NestJS",
+      summary: [
+        "AI Developer with 2+ years of software experience building production LLM and voice-AI systems — retrieval over pgvector / Pinecone with per-tenant namespaces, LLM-based answer evaluation, speech-to-text / text-to-speech voice pipelines and OCR document extraction, running on Node.js / NestJS backends with Redis / BullMQ workers.",
+        "Built Interview AI's voice-interview pipeline (STT → LLM → TTS), live with 6+ university tenants and 70+ AI interviews conducted, and a public voice-AI API gateway of 56+ REST endpoints, with RAG knowledge bases, used by 10+ client integrations. Also shipped AI features in mobile apps: a Deepgram voice-to-job assistant and NLP sentiment analysis on 2,000+ call recordings. Open to relocation or remote work, available to join immediately.",
+      ],
+      strengths: [
+        "Applied AI in production — RAG (chunking, embeddings, vector search), LLM evaluation, STT / TTS voice pipelines and OCR, not notebooks or demos.",
+        "AI that survives real load — idempotent, retryable BullMQ workers, per-tenant isolation and a public API consumed by 10+ client integrations.",
+      ],
+    },
     mobile: {
       title: "Mobile App Developer (React Native & Kotlin)",
       subtitle: "React Native | Kotlin Native Modules | TypeScript | Offline-first | Play Store & App Store",

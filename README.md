@@ -51,6 +51,7 @@ Your base resume is the **universal** one. The **Role** switch rebuilds it for t
 | **Full Stack** | Web product delivery — React / Next.js + Node.js / NestJS |
 | **Full Stack Mobile** | The app *and* the server behind it |
 | **Full Stack AI** | LLM / RAG / voice products, with the APIs and UIs that ship them |
+| **AI Developer** | The AI systems themselves — RAG, LLM evaluation, voice pipelines, OCR |
 | **Mobile App Developer** | Apps, native modules, store releases |
 | **Backend** | APIs, data, queues, multi-tenancy |
 

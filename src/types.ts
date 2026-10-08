@@ -13,7 +13,7 @@ export interface Job {
 export interface Education { deg: string; inst: string; date: string; }
 
 /** Which kind of role the resume is being positioned for. */
-export type RoleFocus = "balanced" | "fullstack" | "fsmobile" | "fsai" | "mobile" | "backend";
+export type RoleFocus = "balanced" | "fullstack" | "fsmobile" | "fsai" | "ai" | "mobile" | "backend";
 
 /** Hand-written, fact-checked headline, summary and strengths for one role focus. */
 export interface RoleVariant { title?: string; subtitle?: string; summary?: string[]; strengths?: string[]; }

@@ -29,7 +29,8 @@ export const JOB_PREFS_DEFAULT: JobPrefs = {
 const ROLE_LIBRARY: Record<Focus, string[]> = {
   fullstack: ["Full Stack Developer", "MERN Stack Developer"],
   fsmobile: ["React Native Developer", "Full Stack Mobile Developer"],
-  fsai: ["AI Engineer", "Generative AI Developer"],
+  fsai: ["Full Stack AI Engineer", "AI Full Stack Developer"],
+  ai: ["AI Developer", "Generative AI Developer"],
   mobile: ["Mobile App Developer", "Android Developer"],
   backend: ["Node.js Developer", "Backend Developer"],
 };

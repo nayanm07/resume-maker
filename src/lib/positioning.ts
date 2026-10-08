@@ -4,9 +4,9 @@ import { clone } from "./resume";
 type Focus = Exclude<RoleFocus, "balanced">;
 type Discipline = "web" | "backend" | "mobile" | "ai";
 
-export const FOCUS_IDS: RoleFocus[] = ["balanced", "fullstack", "fsmobile", "fsai", "mobile", "backend"];
+export const FOCUS_IDS: RoleFocus[] = ["balanced", "fullstack", "fsmobile", "fsai", "ai", "mobile", "backend"];
 
-/** Guards a stored preference: older builds saved ids ("ai") that no longer exist. */
+/** Guards a stored preference: a build may have saved an id that no longer exists. */
 export const isFocus = (v: unknown): v is RoleFocus => FOCUS_IDS.includes(v as RoleFocus);
 
 export const FOCUS_LABEL: Record<RoleFocus, string> = {
@@ -14,6 +14,7 @@ export const FOCUS_LABEL: Record<RoleFocus, string> = {
   fullstack: "Full Stack",
   fsmobile: "Full Stack Mobile",
   fsai: "Full Stack AI",
+  ai: "AI Developer",
   mobile: "Mobile App Developer",
   backend: "Backend",
 };
@@ -23,6 +24,7 @@ export const FOCUS_ROLE: Record<Focus, string> = {
   fullstack: "Full Stack Developer",
   fsmobile: "Full Stack Mobile Developer",
   fsai: "Full Stack AI Engineer",
+  ai: "AI Developer",
   mobile: "Mobile App Developer",
   backend: "Backend Engineer",
 };
@@ -35,6 +37,8 @@ export const FOCUS_GUIDE: Record<Focus, string> = {
     "Open the headline and summary with mobile products owned end to end: the shipped apps, native modules, offline-first and real-time features, AND the backend APIs, databases and deployments built behind them. Give the app and its server side equal weight; web dashboards are supporting context.",
   fsai:
     "Open the headline and summary with AI products built end to end: LLMs, RAG (chunking, embeddings, vector search), speech-to-text / text-to-speech, OCR and LLM evaluation, AND the APIs and product UIs that deliver them to users. Present mobile work only as another place AI features were shipped.",
+  ai:
+    "Open the headline and summary with the AI systems themselves: LLMs, RAG (chunking, embeddings, vector search), LLM evaluation, speech-to-text / text-to-speech pipelines and OCR, and the backends that run them in production. Keep the candidate's real languages and frameworks exactly as the resume states them — never restate the stack as Python or any framework the resume does not show. Web and mobile work appear only as where AI features were shipped.",
   mobile:
     "Open the headline and summary with mobile apps: shipped and maintained apps, store releases, download counts, native modules, offline-first and real-time features. Present backend work as support for the mobile products.",
   backend:
@@ -83,6 +87,7 @@ const WEIGHTS: Record<Focus, Record<Discipline, number>> = {
   fullstack: { web: 1.0, backend: 1.0, mobile: 0.2, ai: 0.3 },
   fsmobile:  { web: 0.35, backend: 0.75, mobile: 1.0, ai: 0.2 },
   fsai:      { web: 0.55, backend: 0.6, mobile: 0.1, ai: 1.0 },
+  ai:        { web: 0.15, backend: 0.45, mobile: 0.1, ai: 1.0 },
   mobile:    { web: 0.1, backend: 0.15, mobile: 1.0, ai: 0.1 },
   backend:   { web: 0.2, backend: 1.0, mobile: 0.1, ai: 0.3 },
 };
@@ -138,7 +143,7 @@ export function detectFocus(target: string, jd: string): RoleFocus {
     if (MOBILE_WORD.test(title) || share("mobile") >= 0.3) return "fsmobile";
     return "fullstack";
   }
-  if (/\b(ai|ml|llm|gen\s?ai|machine learning)\b[^\n]{0,25}\b(engineer|developer)\b|\bprompt engineer/.test(head)) return "fsai";
+  if (/\b(ai|ml|llm|gen\s?ai|machine learning)\b[^\n]{0,25}\b(engineer|developer)\b|\bprompt engineer/.test(head)) return "ai";
   if (MOBILE_WORD.test(head)) {
     // a mobile title that also asks for real server work is the full-stack flavour
     return share("backend") >= 0.4 ? "fsmobile" : "mobile";
@@ -147,7 +152,8 @@ export function detectFocus(target: string, jd: string): RoleFocus {
 
   // 2) otherwise weigh keywords across the JD (target counts triple)
   if (total < 4) return "balanced";
-  if (share("ai") >= 0.35) return "fsai";
+  // an AI-heavy JD that also asks for product UI work is the full-stack flavour
+  if (share("ai") >= 0.35) return share("web") >= 0.15 ? "fsai" : "ai";
   if (share("mobile") >= 0.4) return share("backend") + share("web") >= 0.3 ? "fsmobile" : "mobile";
   if (share("backend") >= 0.55 && share("web") < 0.15) return "backend";
   if (share("web") + share("backend") >= 0.6 && c.web >= 2 && c.backend >= 2) return "fullstack";
@@ -163,6 +169,7 @@ const CATEGORY_ORDER: Record<Focus, RegExp[]> = {
   fullstack: [/lang|program/, /front/, /back/, /data|sql/, /cloud|devops/, /\bai\b|\bml\b|voice/, /mobile/, /payment|api/, /test|tool/, /cert/],
   fsmobile:  [/mobile/, /lang|program/, /back/, /front/, /data|sql/, /cloud|devops/, /payment|api/, /\bai\b|\bml\b|voice/, /test|tool/, /cert/],
   fsai:      [/\bai\b|\bml\b|voice|llm/, /lang|program/, /back/, /front/, /data|sql/, /cloud|devops/, /payment|api/, /mobile/, /test|tool/, /cert/],
+  ai:        [/\bai\b|\bml\b|voice|llm/, /lang|program/, /back/, /data|sql/, /cloud|devops/, /front/, /payment|api/, /mobile/, /test|tool/, /cert/],
   mobile:    [/mobile/, /lang|program/, /front/, /payment|api/, /back/, /data|sql/, /cloud|devops/, /\bai\b|\bml\b|voice/, /test|tool/, /cert/],
   backend:   [/lang|program/, /back/, /data|sql/, /cloud|devops/, /\bai\b|\bml\b|voice/, /front/, /payment|api/, /mobile/, /test|tool/, /cert/],
 };
