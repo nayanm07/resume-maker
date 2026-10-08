@@ -20,9 +20,7 @@ export const BASE: Resume = {
     "Full-Stack Software Engineer with 2+ years of experience shipping production products across web, backend, mobile and AI — React / Next.js frontends, Node.js / NestJS REST APIs on PostgreSQL, React Native apps and LLM-powered features, deployed on AWS.",
     "Built and operate Clinic Cloud, a live multi-tenant healthcare SaaS; engineered a database-per-tenant AI interview platform for 6+ universities and a public voice-AI API of 56+ endpoints; and have built or maintained 10+ production apps with 1.5M+ combined downloads. Open to relocation or remote work, available to join immediately.",
   ],
-  /* Python and FastAPI are listed because they have been learned, not because
-     anything below was built with them — every project in the experience runs
-     on Node.js / NestJS, and the bullets must keep saying so. */
+  
   skills: [
     { label: "Frontend", items: ["React", "Next.js", "TypeScript", "JavaScript (ES6+)", "Redux Toolkit (RTK Query)", "Axios", "Zod", "Formik"] },
     { label: "Backend", items: ["Node.js", "NestJS", "Express.js", "Python", "FastAPI", "REST APIs", "PostgreSQL", "MySQL", "MongoDB", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
@@ -69,13 +67,14 @@ export const BASE: Resume = {
           projects: [
             {
               title: "Interview AI — Voice Interview SaaS for Universities",
-              meta: "NestJS, Prisma, Redis/BullMQ, OpenAI, Pinecone, Next.js",
+              meta: "NestJS, FastAPI, Prisma, Redis/BullMQ, OpenAI, Pinecone, Next.js",
               bullets: [
                 "Engineered a database-per-tenant architecture (AsyncLocalStorage tenant resolution + LRU connection pool) with fully automated provisioning and migrations — live with 6+ university tenants, 300+ students onboarded and 70+ AI mock interviews conducted.",
                 "Built an end-to-end AI interview pipeline — STT → LLM evaluation → TTS — scoring every answer correct/incorrect and emailing the student a PDF report on idempotent, retryable BullMQ workers.",
                 "Added Azure Document Intelligence OCR for ID verification and vector search over the question bank and transcripts (pgvector + Pinecone, per-tenant namespaces).",
                 "Built a WhatsApp AI assistant on the Meta Cloud API that answers student queries and books interview slots, using LangChain with vector-DB retrieval over each university's content.",
                 "Developed the React / Next.js frontend — admin dashboards, student onboarding and document upload, interview reporting UI and a bulk email-campaign tool with customisable templates.",
+                "Built a FastAPI evaluation pipeline that converts interview recordings into transcripts, indexes them against the question bank and evaluation criteria in a vector knowledge base, auto-generates targeted follow-up interviews from weak areas and produces dedicated study material so each student can prepare for their next interview.",
                 "Built live proctoring during the interview: screen recording, real-time emotion and eye-contact detection, and photo capture.",
               ],
             },
@@ -99,11 +98,12 @@ export const BASE: Resume = {
          A dateless entry sitting among dated jobs is read by ATS parsers as a broken
          record or an employment gap — every other entry here carries a date. */
       date: "Live in Production",
-      place: "goclinic.online · Built and operated end-to-end on personal time · NestJS, Prisma, PostgreSQL, Redis, React / Next.js, AWS.",
+      place: "goclinic.online · Built and operated end-to-end on personal time · NestJS, FastAPI, Prisma, PostgreSQL, Redis, React / Next.js, AWS.",
       bullets: [
         "Architected a multi-tenant healthcare SaaS serving multiple isolated clinics across 27+ feature modules from a single NestJS deployment — header-based tenant isolation, JWT + OTP auth, fine-grained RBAC and subscription-feature gating.",
         "Integrated India's ABDM/ABHA national health-record system end-to-end: HIP bridge services, ABHA patient creation, scan-and-share consent flows, QR generation and server-to-server callbacks.",
         "Built real-time appointment booking (Socket.IO, token-based slots, holiday/leave validation) and a multi-language WhatsApp Cloud API bot for bookings, reminders, payment links and QR check-in on BullMQ queues.",
+        "Built a FastAPI-powered WhatsApp NLP agent for appointment booking — handles both text chat and voice messages (STT transcription), understands natural-language queries, resolves doctor/slot availability and confirms bookings conversationally.",
         "Shipped Razorpay subscription billing with webhooks and automated invoice PDFs to S3.",
         "Scaled a Prisma layer of 80+ models / 39+ migrations with Redis caching for hot clinic and permission data.",
         "Built the React / Next.js app for clinic staff and admins — appointments, patient records, billing and analytics — with role-based UI gating.",
@@ -235,11 +235,10 @@ export const BASE: Resume = {
         "Production AI platforms — a database-per-tenant voice-interview SaaS and a public voice-AI API consumed by 10+ client integrations.",
       ],
     },
-    /* FastAPI sits in the headline as a framework that has been learned. The
-       systems themselves run on Node.js / NestJS: the summary and the bullets
-       say so, and must not be reworded to say they were built in Python or
-       FastAPI — an AI interview tests Python directly, and a claim the code
-       cannot back fails at the first follow-up. */
+    /* FastAPI is used in two production features: the WhatsApp NLP booking
+       agent in Clinic Cloud and the evaluation pipeline in Interview AI.
+       The core platforms still run on Node.js / NestJS — summaries and
+       bullets must reflect which parts are FastAPI and which are NestJS. */
     ai: {
       title: "AI Developer (LLM, RAG & Voice AI)",
       subtitle: "Node.js / NestJS / FastAPI | LLMs | RAG & Embeddings | Vector DB | STT / TTS | OCR",
