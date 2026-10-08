@@ -4,6 +4,9 @@ import {
   A4_W, A4_H, renderResumeHtml, type EmphasisMode, type TemplateId,
 } from "../lib/resumeHtml";
 
+/* A4 at 96dpi, as Chrome's print output measures it (595 x 841.9pt). */
+const PRINT_PAGE_H = 1122.5;
+
 export interface PreviewHandle {
   /** Opens the print dialog. `filename` becomes the suggested "Save as PDF" name. */
   print: (filename?: string) => void;
@@ -44,7 +47,15 @@ export function ResumePreview({
     const last = doc?.querySelector(".body")?.lastElementChild;
     if (!doc?.body || !last) return;
     const h = last.getBoundingClientRect().bottom - doc.body.getBoundingClientRect().top;
-    if (h > 0) onPagesRef.current?.(h / A4_H);
+    /* The page keeps its bottom padding when it prints (box-decoration-break:
+       clone), so content has to end that far above the page edge. Found by
+       nudging a resume's height a few px at a time: it stayed on one page up
+       to 1098px and went to two at 1102, with 24px of bottom padding. Text
+       wraps identically on screen and in print, so no other allowance is needed.
+       Padding is read unzoomed, hence the text-scale factor. */
+    const wrapper = doc.querySelector(".body") as HTMLElement;
+    const pad = (parseFloat(getComputedStyle(wrapper).paddingBottom) || 0) * textScale;
+    if (h > 0) onPagesRef.current?.((h + pad) / PRINT_PAGE_H);
   };
 
   const html = useMemo(

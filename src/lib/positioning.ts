@@ -54,7 +54,7 @@ const SIGNALS: Record<Discipline, RegExp[]> = {
     /redux|\brtk\b/g, /\bhtml\b|\bcss\b|tailwind/g, /\bssr\b|\bseo\b|responsive/g, /admin/g,
   ],
   backend: [
-    /back[\s-]?end/g, /\bnode(\.js)?\b/g, /nest\.?js/g, /express/g, /\bapis?\b|\brest\b|openapi|endpoint/g,
+    /back[\s-]?end/g, /\bnode(\.js)?\b/g, /nest\.?js/g, /express/g, /python|fastapi|django|flask/g, /\bapis?\b|\brest\b|openapi|endpoint/g,
     /postgres|mysql|mongo|prisma|database|\bsql\b/g, /redis|bullmq|queue|worker/g, /tenan/g,
     /microservice/g, /websocket|socket\.io/g, /docker|\baws\b|ci\/cd|nginx|\bec2\b/g,
     // anchored: bare /auth/ also matches "authored a developer reference"
@@ -152,8 +152,11 @@ export function detectFocus(target: string, jd: string): RoleFocus {
 
   // 2) otherwise weigh keywords across the JD (target counts triple)
   if (total < 4) return "balanced";
-  // an AI-heavy JD that also asks for product UI work is the full-stack flavour
-  if (share("ai") >= 0.35) return share("web") >= 0.15 ? "fsai" : "ai";
+  // An AI-heavy JD under a general title ("Software Developer") that also names
+  // a frontend and a backend technology wants the whole product built, not only
+  // the model side. Counts, not shares: one "React.js" in a skills list is a
+  // requirement even when AI words outnumber it.
+  if (share("ai") >= 0.35) return c.web >= 1 && c.backend >= 2 ? "fsai" : "ai";
   if (share("mobile") >= 0.4) return share("backend") + share("web") >= 0.3 ? "fsmobile" : "mobile";
   if (share("backend") >= 0.55 && share("web") < 0.15) return "backend";
   if (share("web") + share("backend") >= 0.6 && c.web >= 2 && c.backend >= 2) return "fullstack";

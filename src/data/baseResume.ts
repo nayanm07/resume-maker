@@ -20,14 +20,17 @@ export const BASE: Resume = {
     "Full-Stack Software Engineer with 2+ years of experience shipping production products across web, backend, mobile and AI — React / Next.js frontends, Node.js / NestJS REST APIs on PostgreSQL, React Native apps and LLM-powered features, deployed on AWS.",
     "Built and operate Clinic Cloud, a live multi-tenant healthcare SaaS; engineered a database-per-tenant AI interview platform for 6+ universities and a public voice-AI API of 56+ endpoints; and have built or maintained 10+ production apps with 1.5M+ combined downloads. Open to relocation or remote work, available to join immediately.",
   ],
+  /* Python and FastAPI are listed because they have been learned, not because
+     anything below was built with them — every project in the experience runs
+     on Node.js / NestJS, and the bullets must keep saying so. */
   skills: [
     { label: "Frontend", items: ["React", "Next.js", "TypeScript", "JavaScript (ES6+)", "Redux Toolkit (RTK Query)", "Axios", "Zod", "Formik"] },
-    { label: "Backend", items: ["Node.js", "NestJS", "Express.js", "REST APIs", "PostgreSQL", "MySQL", "MongoDB", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
+    { label: "Backend", items: ["Node.js", "NestJS", "Express.js", "Python", "FastAPI", "REST APIs", "PostgreSQL", "MySQL", "MongoDB", "Prisma", "Redis", "BullMQ", "WebSocket / Socket.IO", "Multi-Tenant Architecture", "JWT + RBAC"] },
     { label: "Mobile", items: ["React Native", "Kotlin (Native Modules)", "Offline-first SQLite", "Firebase (FCM)", "Google Play Console", "App Store Connect"] },
     { label: "AI & Voice", items: ["LLMs (OpenAI, Gemini)", "RAG(Pinecone, pgvector)", "Embeddings(OpenAI, Deepgram)", "Chunking", "Vector DB (Pinecone, pgvector)", "STT (Deepgram , Whisper)", "TTS (ElevenLabs)", "OCR (Azure Document Intelligence)", "LangChain (basic)"] },
     { label: "Cloud & DevOps", items: ["AWS (EC2 / S3 / CloudFront)", "Hostinger VPS", "Docker", "Nginx", "GitHub Actions CI/CD", "Let's Encrypt HTTPS"] },
     { label: "Payments & APIs", items: ["Razorpay", "Stripe", "PayPal", "Coinbase", "WhatsApp Cloud API", "ABDM / ABHA", "Google Maps SDK", "AdMob"] },
-    { label: "Testing & Tools", items: ["Jest", "Unit Testing", "Detox", "Postman", "Android Studio", "Git", "Swagger"] },
+    { label: "Testing & Tools", items: ["Jest", "Unit Testing", "Detox", "Postman", "Android Studio", "Git & GitHub", "Swagger"] },
   ],
   experience: [
     {
@@ -264,7 +267,7 @@ export const BASE: Resume = {
       subtitle: "Node.js | NestJS | TypeScript | PostgreSQL | Redis / BullMQ | AWS",
       summary: [
         "Backend Engineer with 2+ years of experience designing multi-tenant SaaS backends and public REST APIs in Node.js / NestJS and TypeScript — PostgreSQL / Prisma data models, Redis / BullMQ job queues, real-time WebSockets and Dockerized AWS deployments.",
-        "Architected Interview AI's database-per-tenant platform (6+ university tenants, automated provisioning) and Clinic Cloud, a live healthcare SaaS with 27+ modules, 80+ Prisma models and India's ABDM/ABHA integration. Built a public OpenAPI gateway of 56+ REST endpoints consumed by 10+ client integrations. Open to relocation or remote work, available to join immediately.",
+        "Architected Interview AI's database-per-tenant platform (6+ university tenants, automated provisioning) and Clinic Cloud, a live multi-tenant healthcare SaaS with 27+ feature modules. Built a public OpenAPI gateway of 56+ REST endpoints consumed by 10+ client integrations. Open to relocation or remote work, available to join immediately.",
       ],
       strengths: [
         "Multi-tenant SaaS & public API design — shared-DB and database-per-tenant systems, OpenAPI gateways, RBAC and automated provisioning.",
