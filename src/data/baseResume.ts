@@ -225,7 +225,7 @@ export const BASE: Resume = {
     },
     fsai: {
       title: "Full Stack AI Engineer",
-      subtitle: "LLMs | RAG & Vector DB | STT / TTS | Node.js / NestJS | React / Next.js | AWS",
+      subtitle: "LLMs | RAG & Vector DB | STT / TTS | Node.js / NestJS / FastAPI | React / Next.js | AWS",
       summary: [
         "Full Stack AI Engineer with 2+ years of experience building production LLM and voice-AI products end to end — RAG pipelines (chunking, embeddings, pgvector / Pinecone vector search), LLM-based evaluation, speech-to-text / text-to-speech voice agents and OCR, delivered through Node.js / NestJS APIs and React / Next.js frontends.",
         "Built Interview AI, a voice-interview platform (STT → LLM → TTS) serving 6+ university tenants with 70+ AI interviews conducted, and a public voice-AI API gateway of 56+ REST endpoints used by 10+ client integrations. Also shipped AI features in mobile apps: a Deepgram voice-to-job assistant and NLP sentiment analysis on 2,000+ call recordings. Open to relocation or remote work, available to join immediately.",
@@ -235,12 +235,14 @@ export const BASE: Resume = {
         "Production AI platforms — a database-per-tenant voice-interview SaaS and a public voice-AI API consumed by 10+ client integrations.",
       ],
     },
-    /* The stack here is the real one: these systems run on Node.js / NestJS.
-       Do not restate them as Python or FastAPI — an AI interview tests Python
-       directly, and a claim the code cannot back fails at the first follow-up. */
+    /* FastAPI sits in the headline as a framework that has been learned. The
+       systems themselves run on Node.js / NestJS: the summary and the bullets
+       say so, and must not be reworded to say they were built in Python or
+       FastAPI — an AI interview tests Python directly, and a claim the code
+       cannot back fails at the first follow-up. */
     ai: {
       title: "AI Developer (LLM, RAG & Voice AI)",
-      subtitle: "LLMs | RAG & Embeddings | Vector DB | STT / TTS | OCR | Node.js / NestJS",
+      subtitle: "Node.js / NestJS / FastAPI | LLMs | RAG & Embeddings | Vector DB | STT / TTS | OCR",
       summary: [
         "AI Developer with 2+ years of software experience building production LLM and voice-AI systems — retrieval over pgvector / Pinecone with per-tenant namespaces, LLM-based answer evaluation, speech-to-text / text-to-speech voice pipelines and OCR document extraction, running on Node.js / NestJS backends with Redis / BullMQ workers.",
         "Built Interview AI's voice-interview pipeline (STT → LLM → TTS), live with 6+ university tenants and 70+ AI interviews conducted, and a public voice-AI API gateway of 56+ REST endpoints, with RAG knowledge bases, used by 10+ client integrations. Also shipped AI features in mobile apps: a Deepgram voice-to-job assistant and NLP sentiment analysis on 2,000+ call recordings. Open to relocation or remote work, available to join immediately.",
